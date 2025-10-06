@@ -1,6 +1,6 @@
 @extends('layouts.base')
 
-@section('title', 'Inicio')
+@section('title', 'PAGA IMT')
 
 @section('content')
 <br>

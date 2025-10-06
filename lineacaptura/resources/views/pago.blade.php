@@ -1,6 +1,6 @@
 @extends('layouts.base')
 
-@section('title', 'Formato de pago · IMT')
+@section('title', 'Formato de pago')
 
 @section('content')
   {{-- Tus estilos CSS se quedan exactamente igual --}}
@@ -16,7 +16,7 @@
     #pasos .nav-pills>li.active>a small{ color:#fff; }
     .btn-gob-outline{ background:#fff !important; color:var(--gob-rojo) !important; border:2px solid var(--gob-rojo) !important; box-shadow:none !important; text-decoration:none !important; }
     .btn-gob-outline:hover,
-    .btn-gob-outline:focus{ background:var(--gob-rojo) !important; color:#fff !important; border-color:var(--gob-rojo) !important; box-shadow:none !important; text-decoration:none !important; }
+    .btn-gob-outline:focus{ background:var(--gob-rojo) !important; color:#fff !important; border-color:var(--gob-rojo) !important; box-shadow:none !important; text-decoration:none !important; outline: none !important; }
     .equal-panels{ display:flex; flex-wrap:wrap; }
     .equal-panels>[class*="col-"]{ display:flex; }
     .equal-panels .caja{ display:flex; flex-direction:column; width:100%; }
@@ -59,22 +59,26 @@
   </div>
 
   {{-- Encabezado --}}
-  <h3 style="margin-top:0">Resumen del trámite y la persona:</h3>
+  <h3 style="margin-top:0">Resumen del trámite y datos de la persona:</h3>
   <div style="height:4px; width:48px; background:#a57f2c; margin:6px 0 18px;"></div>
 
   <div class="row equal-panels">
     {{-- Resumen del trámite --}}
     <div class="col-md-6">
       <div class="caja">
-        <h4>Trámite seleccionado</h4>
+        <br>
+        <center><h4>Trámite seleccionado</h4></center>
+        <hr>
         <dl class="dl-horizontal resumen">
           <dt>Dependencia</dt><dd>{{ $dependencia->nombre }}</dd>
           <dt>Clave de dependencia</dt><dd>{{ $dependencia->clave_dependencia }}</dd>
           <dt>Unidad administrativa</dt><dd>{{ $dependencia->unidad_administrativa }}</dd>
           <dt>Descripción</dt><dd>{{ $tramite->descripcion }}</dd>
           <dt>Cuota</dt><dd class="importe">${{ number_format($tramite->cuota, 2) }} MXN</dd>
-          <dt>IVA</dt><dd class="importe">${{ number_format($tramite->cuota * $tramite->porcentaje_iva, 2) }} MXN</dd>
-          <dt>Importe Total</dt><dd class="importe">${{ number_format($tramite->total_tramite, 2) }} MXN</dd>
+          
+          {{-- MODIFICACIÓN 1: Mostrar el monto de IVA directamente desde la BD --}}
+          <dt>IVA</dt><dd class="importe">${{ number_format($tramite->monto_iva, 2) }} MXN</dd>
+          <dt>Importe total</dt><dd class="importe">${{ number_format($tramite->cuota + $tramite->monto_iva, 2) }} MXN</dd>
         </dl>
       </div>
     </div>
@@ -82,7 +86,9 @@
     {{-- Resumen de la persona --}}
     <div class="col-md-6">
       <div class="caja">
-        <h4>Datos de la persona</h4>
+        <br>
+        <center><h4>Datos de la persona</h4></center>
+        <hr>
         <dl class="dl-horizontal resumen">
           <dt>Tipo</dt><dd>{{ $personaData['tipo_persona'] === 'fisica' ? 'Persona Física' : 'Persona Moral' }}</dd>
 
@@ -90,7 +96,7 @@
             {{-- CAMPOS PARA PERSONA FÍSICA --}}
             <dt>CURP</dt><dd>{{ $personaData['curp'] }}</dd>
             <dt>RFC</dt><dd>{{ $personaData['rfc'] }}</dd>
-            <dt>Nombre Completo</dt><dd>{{ $personaData['nombres'] }} {{ $personaData['apellido_paterno'] }} {{ $personaData['apellido_materno'] }}</dd>
+            <dt>Nombre completo</dt><dd>{{ $personaData['nombres'] }} {{ $personaData['apellido_paterno'] }} {{ $personaData['apellido_materno'] }}</dd>
           @else
             {{-- CAMPOS PARA PERSONA MORAL --}}
             <dt>RFC</dt><dd>{{ $personaData['rfc'] }}</dd>

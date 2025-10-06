@@ -1,6 +1,6 @@
 @extends('layouts.base')
 
-@section('title', 'Selección de trámite · ' . $dependencia->nombre)
+@section('title', 'Selección de trámite')
 
 @section('content')
   <style>
@@ -84,6 +84,7 @@
       border-color:var(--gob-rojo) !important;
       text-decoration:none !important;
       box-shadow:none !important;
+      outline: none !important;
     }
 
     /* ====== Acciones: apilar botones solo en móvil ====== */

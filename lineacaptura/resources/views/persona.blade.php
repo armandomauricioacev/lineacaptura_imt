@@ -1,10 +1,10 @@
 @extends('layouts.base')
 
-@section('title', 'Datos de la persona · IMT')
+@section('title', 'Datos de la persona')
 
 @section('content')
   <style>
-    /* ... (CSS sin cambios) ... */
+    /* ... (Tu CSS no necesita cambios) ... */
     :root{ --gob-rojo:#611232; }
     #pasos .nav-pills{ display:flex; justify-content:center; align-items:stretch; gap:12px; padding-left:0; flex-wrap:nowrap; }
     #pasos .nav-pills>li{ float:none; display:block; }
@@ -16,7 +16,7 @@
     #pasos .nav-pills>li.active>a small{ color:#fff; }
     .btn-gob-outline{ background:#fff !important; color:var(--gob-rojo) !important; border:2px solid var(--gob-rojo) !important; box-shadow:none !important; text-decoration:none !important; }
     .btn-gob-outline:hover,
-    .btn-gob-outline:focus{ background:var(--gob-rojo) !important; color:#fff !important; border-color:var(--gob-rojo) !important; box-shadow:none !important; text-decoration:none !important; }
+    .btn-gob-outline:focus{ background:var(--gob-rojo) !important; color:#fff !important; border-color:var(--gob-rojo) !important; box-shadow:none !important; text-decoration:none !important; outline: none !important; }
     .error-message { display: none; color: #a94442; margin-top: 5px; font-size: 12px; }
     @media (max-width:575px){
       #pasos .nav-pills{ flex-direction:column; align-items:center; flex-wrap:nowrap; }
@@ -32,6 +32,9 @@
     <li><a href="{{ url('/') }}">Inicio</a></li>
     <li><a href="{{ url('/tramite') }}">Instituto Mexicano del Transporte</a></li>
   </ol>
+
+  {{-- Contenedor para la alerta --}}
+  <div id="alert-placeholder" style="margin-top: 15px;"></div>
 
   {{-- Título --}}
   <center><h1 style="margin:10px 0 6px;">Instituto Mexicano del Transporte</h1></center>
@@ -64,8 +67,6 @@
         </label>
       </div>
       <p class="help-block" style="margin-top:6px">Selecciona una opción para mostrar los campos.</p>
-      {{-- ✅ Contenedor para el mensaje de error de "Tipo de persona" --}}
-      <small id="tipo_persona-error" class="error-message"></small>
     </div>
 
     {{-- Persona física (oculto por defecto) --}}
@@ -156,27 +157,36 @@ document.addEventListener('DOMContentLoaded', function () {
     const pm = document.getElementById('pm');
     const radios = document.querySelectorAll('input[name="tipo_persona"]');
     const uppercaseInputs = document.querySelectorAll('.to-uppercase');
+    const alertPlaceholder = document.getElementById('alert-placeholder');
     
+    // --- Lógica para mostrar/ocultar campos (sin cambios) ---
     function syncTipo() {
         const r = document.querySelector('input[name="tipo_persona"]:checked');
-        if (!r) return;
         pf.querySelectorAll('input').forEach(input => input.required = false);
         pm.querySelectorAll('input').forEach(input => input.required = false);
-        if (r.value === 'fisica') {
-            pm.style.display = 'none';
-            pf.style.display = 'block';
-            pf.querySelectorAll('input').forEach(input => input.required = true);
+        
+        if (r) {
+            if (r.value === 'fisica') {
+                pm.style.display = 'none';
+                pf.style.display = 'block';
+                pf.querySelectorAll('input').forEach(input => input.required = true);
+            } else {
+                pf.style.display = 'none';
+                pm.style.display = 'block';
+                pm.querySelectorAll('input').forEach(input => input.required = true);
+            }
         } else {
             pf.style.display = 'none';
-            pm.style.display = 'block';
-            pm.querySelectorAll('input').forEach(input => input.required = true);
+            pm.style.display = 'none';
         }
-        // Limpiar errores al cambiar de tipo de persona
+        
+        alertPlaceholder.innerHTML = '';
         document.querySelectorAll('.error-message').forEach(el => el.style.display = 'none');
     }
     radios.forEach(r => r.addEventListener('change', syncTipo));
     syncTipo();
-
+    
+    // --- Lógica de mayúsculas (sin cambios) ---
     uppercaseInputs.forEach(input => {
         input.addEventListener('input', function() {
             let originalValue = this.value;
@@ -190,6 +200,7 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     });
 
+    // --- Lógica de validación de campos (sin cambios) ---
     function showError(elementId, message) {
         const errorElement = document.getElementById(elementId + '-error');
         if (errorElement) {
@@ -205,20 +216,41 @@ document.addEventListener('DOMContentLoaded', function () {
             errorElement.style.display = 'none';
         }
     }
-
-    function validateForm() {
+    
+    // --- Lógica principal del formulario al enviar ---
+    personaForm.addEventListener('submit', function(event) {
+        event.preventDefault(); // Siempre prevenimos el envío para validar
+        
         let isValid = true;
         let firstErrorElement = null;
 
-        document.querySelectorAll('.error-message').forEach(el => el.style.display = 'none');
+        alertPlaceholder.innerHTML = ''; // Limpiar alerta grande
+        document.querySelectorAll('.error-message').forEach(el => el.style.display = 'none'); // Limpiar errores pequeños
 
-        // ✅ SECCIÓN MODIFICADA: Validar primero el tipo de persona
         const tipoPersonaSeleccionado = document.querySelector('input[name="tipo_persona"]:checked');
+        
         if (!tipoPersonaSeleccionado) {
             isValid = false;
-            // Mostramos el error en el nuevo <small> y lo marcamos como el primer error
-            showError('tipo_persona', 'Debes seleccionar un tipo de persona para continuar.');
-            firstErrorElement = document.getElementById('tipo_persona_fisica'); // Apuntamos al primer radio button
+            const alertHTML = `
+                <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                  <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                  </button>
+                  <strong>¡Precaución!</strong> Debes seleccionar un tipo de persona para poder continuar.
+                </div>
+            `;
+            alertPlaceholder.innerHTML = alertHTML;
+            
+            // ==========================================================
+            // CAMBIO CLAVE: Hacer scroll a la alerta, no al campo.
+            // ==========================================================
+            alertPlaceholder.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+            const closeButton = alertPlaceholder.querySelector('.close');
+            if (closeButton) {
+                closeButton.addEventListener('click', function() { this.closest('.alert').remove(); });
+            }
+
         } else {
             const visibleSection = (tipoPersonaSeleccionado.value === 'fisica') ? pf : pm;
             const requiredInputs = visibleSection.querySelectorAll('input[required]');
@@ -236,16 +268,20 @@ document.addEventListener('DOMContentLoaded', function () {
                     if (!firstErrorElement) firstErrorElement = input;
                 }
             }
+            
+            // Si hay errores en los campos, hacer scroll al primero de ellos
+            if (!isValid && firstErrorElement) {
+                firstErrorElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
         }
         
-        if (!isValid && firstErrorElement) {
-            firstErrorElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        // Si después de todas las validaciones, todo es correcto, enviar el formulario
+        if (isValid) {
+            personaForm.submit();
         }
+    });
 
-        return isValid;
-    }
-
-    // Se asigna la validación a cada campo individualmente (on blur)
+    // Validar en tiempo real al salir de un campo (sin cambios)
     document.querySelectorAll('#pf input[required], #pm input[required]').forEach(input => {
         input.addEventListener('blur', function() {
             if (!this.value.trim()) {
@@ -256,13 +292,6 @@ document.addEventListener('DOMContentLoaded', function () {
                 hideError(this.id);
             }
         });
-    });
-
-    personaForm.addEventListener('submit', function(event) {
-        event.preventDefault();
-        if (validateForm()) {
-            personaForm.submit();
-        }
     });
 });
 </script>
