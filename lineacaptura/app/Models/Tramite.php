@@ -27,4 +27,9 @@ class Tramite extends Model
 
     // Campos de fechas
     public $timestamps = true;
+
+    public function transacciones()
+    {
+    return $this->hasMany(TramiteTransaccion::class);
+    }
 }

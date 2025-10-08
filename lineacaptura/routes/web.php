@@ -25,3 +25,17 @@ Route::post('/pago', [LineaCapturaController::class, 'storePersonaData'])->name(
 
 // Muestra la página de resumen/pago con toda la información
 Route::get('/pago', [LineaCapturaController::class, 'showPagoPage'])->name('pago.show');
+
+// Ruta para el panel de administración
+Route::get('/admin', function () {
+    return view('admin');
+});
+
+
+// Muestra la página de resumen/pago con toda la información
+Route::get('/pago', [LineaCapturaController::class, 'showPagoPage'])->name('pago.show');
+
+// =========================================================================
+//  NUEVA RUTA: Recibe la petición final para generar la línea de captura
+// =========================================================================
+Route::post('/generar-linea', [LineaCapturaController::class, 'generarLineaCaptura'])->name('linea.generar');

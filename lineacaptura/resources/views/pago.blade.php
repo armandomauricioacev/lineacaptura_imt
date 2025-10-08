@@ -1,6 +1,6 @@
 @extends('layouts.base')
 
-@section('title', 'Formato de pago')
+@section('title', 'Resumen de pago')
 
 @section('content')
   {{-- Tus estilos CSS se quedan exactamente igual --}}
@@ -69,16 +69,27 @@
         <br>
         <center><h4>Trámite seleccionado</h4></center>
         <hr>
+
+        @php
+            $cuota = $tramite->cuota;
+            $montoIva = 0; // Por defecto el IVA es 0
+
+            // Si el trámite está marcado con iva=1 en la BD, calculamos el 16%
+            if ($tramite->iva) {
+                $montoIva = $cuota * 0.16;
+            }
+
+            $total = $cuota + $montoIva;
+        @endphp
+
         <dl class="dl-horizontal resumen">
           <dt>Dependencia</dt><dd>{{ $dependencia->nombre }}</dd>
           <dt>Clave de dependencia</dt><dd>{{ $dependencia->clave_dependencia }}</dd>
           <dt>Unidad administrativa</dt><dd>{{ $dependencia->unidad_administrativa }}</dd>
           <dt>Descripción</dt><dd>{{ $tramite->descripcion }}</dd>
-          <dt>Cuota</dt><dd class="importe">${{ number_format($tramite->cuota, 2) }} MXN</dd>
-          
-          {{-- MODIFICACIÓN 1: Mostrar el monto de IVA directamente desde la BD --}}
-          <dt>IVA</dt><dd class="importe">${{ number_format($tramite->monto_iva, 2) }} MXN</dd>
-          <dt>Importe total</dt><dd class="importe">${{ number_format($tramite->cuota + $tramite->monto_iva, 2) }} MXN</dd>
+          <dt>Cuota</dt><dd class="importe">${{ number_format($cuota, 2) }} MXN</dd>
+          <dt>IVA</dt><dd class="importe">${{ number_format($montoIva, 2) }} MXN</dd>
+          <dt>Importe total</dt><dd class="importe">${{ number_format($total, 2) }} MXN</dd>
         </dl>
       </div>
     </div>
@@ -115,10 +126,15 @@
       </a>
     </div>
     <div class="col-xs-6 text-right">
-      {{-- Este botón ahora debería enviar a un controlador para guardar y generar la línea --}}
-      <a href="#" class="btn btn-gob-outline" aria-label="Generar línea de captura">
-        Generar línea de captura
-      </a>
+      {{-- ========================================================== --}}
+      {{-- CAMBIO CLAVE: El enlace ahora es un formulario que hace POST --}}
+      {{-- ========================================================== --}}
+      <form action="{{ route('linea.generar') }}" method="POST" style="display: inline;">
+        @csrf
+        <button type="submit" class="btn btn-gob-outline" aria-label="Generar línea de captura">
+          Generar línea de captura
+        </button>
+      </form>
     </div>
   </div>
   <br>
