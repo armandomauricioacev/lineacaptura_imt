@@ -14,9 +14,9 @@ class Tramite extends Model
         'clave_dependencia_siglas', 'clave_tramite', 'variante', 'descripcion',
         'tramite_usoreservado', 'fundamento_legal', 'vigencia_tramite_de', 
         'vigencia_tramite_al', 'vigencia_lineacaptura', 'tipo_vigencia', 'clave_contable',
-        'obligatorio', 'agrupador', 'tipo_agrupador', 'nombre_monto', 'variable', 
-        'cuota', 'iva', 'porcentaje_iva', 'actualizacion', 'recargos', 
-        'multa_correccionfiscal', 'compensacion', 'saldo_favor'
+        'obligatorio', 'agrupador', 'tipo_agrupador', 'clave_periodicidad', 'clave_periodo',
+        'nombre_monto', 'variable', 'cuota', 'iva', 'monto_iva', 'actualizacion', 
+        'recargos', 'multa_correccionfiscal', 'compensacion', 'saldo_favor'
     ];
 
     // Relación con Dependencia
@@ -28,8 +28,5 @@ class Tramite extends Model
     // Campos de fechas
     public $timestamps = true;
 
-    public function transacciones()
-    {
-    return $this->hasMany(TramiteTransaccion::class);
-    }
+    // LA FUNCIÓN 'transacciones()' HA SIDO ELIMINADA PARA NO CAUSAR EL ERROR
 }

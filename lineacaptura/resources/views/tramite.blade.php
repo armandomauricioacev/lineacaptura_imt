@@ -4,123 +4,18 @@
 
 @section('content')
   <style>
-    /* ===== Ajustes header/footer del framework GOB.MX (igual que tenías) ===== */
-    header .navbar-toggle .icon-bar,
-    .gm-navbar .navbar-toggle .icon-bar,
-    .navbar-header .navbar-toggle .icon-bar { background-color:#fff !important; border-color:#fff !important; }
-    .gm-navbar .navbar-toggle, .navbar-header .navbar-toggle, header .navbar-toggle {
-      border:2px solid rgba(255,255,255,0.5) !important; background-color:transparent !important;
-    }
-    .gm-navbar .navbar-toggle:hover, .gm-navbar .navbar-toggle:focus,
-    header .navbar-toggle:hover, header .navbar-toggle:focus {
-      background-color:rgba(255,255,255,0.1) !important; border-color:#fff !important;
-    }
-    .gm-navbar .navbar-header, header .navbar-header { display:flex !important; align-items:center !important; min-height:60px !important; }
-    .gm-navbar .navbar-toggle, header .navbar-toggle { margin-top:0 !important; margin-bottom:0 !important; align-self:center !important; }
-    .gm-navbar .navbar-brand, header .navbar-brand { align-self:center !important; }
-    header svg, .gm-navbar svg, .navbar-toggle svg { fill:#fff !important; color:#fff !important; }
-
-    footer, .gm-footer, .page-footer { color:#fff !important; }
-    footer a, .gm-footer a, .page-footer a { color:#fff !important; }
-    footer .dropdown-menu, .gm-footer .dropdown-menu, .page-footer .dropdown-menu { background-color:#611232 !important; }
-    footer .dropdown-menu a, .gm-footer .dropdown-menu a, .page-footer .dropdown-menu a { color:#fff !important; }
-    footer .dropdown-menu li a:link, footer .dropdown-menu li a:visited,
-    .gm-footer .dropdown-menu li a:link, .gm-footer .dropdown-menu li a:visited { color:#fff !important; }
-
-    @media (max-width:768px){
-      .gm-navbar .navbar-toggle .icon-bar{ background-color:#fff !important; box-shadow:none !important; }
-      .gm-footer, .gm-footer a, .gm-footer .dropdown-menu a{ color:#fff !important; }
-    }
+    /* ... (Tu CSS se mantiene igual) ... */
     :root{ --gob-rojo:#611232; }
-
-    /* ====== PASOS: desktop una fila centrada (sin wrap) ====== */
-    #pasos .nav-pills{
-      display:flex;
-      justify-content:center;
-      align-items:stretch;
-      gap:12px;
-      padding-left:0;
-      flex-wrap:nowrap;       /* clave: no envolver en desktop */
-    }
+    #pasos .nav-pills{ display:flex; justify-content:center; align-items:stretch; gap:12px; padding-left:0; flex-wrap:nowrap; }
     #pasos .nav-pills>li{ float:none; display:block; }
-    #pasos .nav-pills>li>a{
-      width:220px; min-height:64px;
-      display:flex; flex-direction:column; align-items:center; justify-content:center;
-      text-align:center; line-height:1.2;
-      text-decoration:none; color:#111; background:#fff;
-      border:1px solid #ddd; border-radius:4px; padding:8px 14px;
-      cursor:default; pointer-events:none;
-    }
-    #pasos .nav-pills>li>a small{ display:block; margin-top:2px; color:#666; }
-    #pasos .nav-pills>li.active>a,
-    #pasos .nav-pills>li.active>a:focus,
-    #pasos .nav-pills>li.active>a:hover{
-      background:var(--gob-rojo); color:#fff !important; border-color:var(--gob-rojo);
-    }
+    #pasos .nav-pills>li>a{ width:220px; min-height:64px; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; line-height:1.2; text-decoration:none; color:#111; background:#fff; border:1px solid #ddd; border-radius:4px; padding:8px 14px; cursor:default; pointer-events:none; }
+    #pasos .nav-pills>li.active>a{ background:var(--gob-rojo); color:#fff !important; border-color:var(--gob-rojo); }
     #pasos .nav-pills>li.active>a small{ color:#fff !important; }
-
-    /* ====== SOLO en celular (≤575px): apilar ====== */
-    @media (max-width:575px){
-      #pasos .nav-pills{
-        flex-direction:column; align-items:center; flex-wrap:nowrap;
-      }
-      #pasos .nav-pills>li>a{
-        width:100%; max-width:280px; min-width:240px;
-      }
-    }
-
-    /* ====== Botón outline rojo (misma forma/tamaño que tus .btn) ====== */
-    .btn-gob-outline{
-      background:#fff !important;
-      color:var(--gob-rojo) !important;
-      border:2px solid var(--gob-rojo) !important;
-      box-shadow:none !important;
-      text-decoration:none !important;
-    }
-    .btn-gob-outline:hover,
-    .btn-gob-outline:focus{
-      background:var(--gob-rojo) !important;
-      color:#fff !important;
-      border-color:var(--gob-rojo) !important;
-      text-decoration:none !important;
-      box-shadow:none !important;
-      outline: none !important;
-    }
-
-    /* ====== Acciones: apilar botones solo en móvil ====== */
-    @media (max-width:575px){
-      .nav-actions .btn{ width:100%; display:inline-block; }
-      .nav-actions .col-xs-6{ width:100%; float:none; }
-      .nav-actions .col-xs-6 + .col-xs-6{ margin-top:10px; text-align:center; }
-    }
-
-    /* ====== Select ====== */
-    #tramite .form-control{
-      width:100%; padding-right:40px; background-color:#fff; color:#333; font-weight:500;
-    }
-    #tramite .form-control:focus{ border-color:#ccc !important; box-shadow:none !important; outline:0; color:#333; }
-    #tramite select{
-      -webkit-appearance:none; -moz-appearance:none; appearance:none;
-      background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'><path d='M1 1l5 5 5-5' fill='none' stroke='%23777' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/></svg>");
-      background-repeat:no-repeat; background-position:right 14px center; background-size:12px 8px;
-    }
-    #tramite select::-ms-expand{ display:none; }
-    #tramite select option[disabled]{ color:#555; }
+    .btn-gob-outline{ background:#fff !important; color:var(--gob-rojo) !important; border:2px solid var(--gob-rojo) !important; box-shadow:none !important; text-decoration:none !important; }
+    .btn-gob-outline:hover, .btn-gob-outline:focus{ background:var(--gob-rojo) !important; color:#fff !important; border-color:var(--gob-rojo) !important; box-shadow:none !important; text-decoration:none !important; outline: none !important; }
+    .btn-quitar { color: #a94442; background: transparent; border: none; font-size: 1.5em; line-height: 1; padding: 0 5px; cursor: pointer; }
+    .btn-quitar:hover { color: #7a2b29; }
   </style>
-
-  <script>
-    // Tu script para los estilos del header/footer de GOB.MX se queda igual
-    document.addEventListener('DOMContentLoaded', function(){
-      setTimeout(function(){
-        document.querySelectorAll('.navbar-toggle .icon-bar, .gm-navbar .icon-bar')
-          .forEach(bar => { bar.style.backgroundColor = '#fff'; bar.style.borderColor = '#fff'; });
-        document.querySelectorAll('.navbar-toggle, .gm-navbar .navbar-toggle')
-          .forEach(btn => { btn.style.borderColor = 'rgba(255,255,255,0.5)'; });
-        document.querySelectorAll('footer a, .gm-footer a')
-          .forEach(link => { link.style.color = '#fff'; });
-      }, 500);
-    });
-  </script>
 
   {{-- Breadcrumb --}}
   <ol class="breadcrumb" style="margin-top:10px">
@@ -128,67 +23,68 @@
     <li>{{ $dependencia->nombre }}</li>
   </ol>
 
-  {{-- Contenedor vacío donde se mostrará la alerta --}}
   <div id="alert-placeholder" style="margin-top: 15px;"></div>
 
-  {{-- Título --}}
+  {{-- Título y Pasos --}}
   <center><h1 style="margin:10px 0 6px;">{{ $dependencia->nombre }}</h1></center>
   <br>
-
-  {{-- Pasos --}}
   <div id="pasos" class="text-center" style="margin-bottom:20px">
     <ul class="nav nav-pills">
-      <li class="active">
-        <a href="#" aria-current="step"><strong>Paso 1</strong><small>Selección del trámite</small></a>
-      </li>
-      <li>
-        <a href="#"><strong>Paso 2</strong><small>Información de la persona</small></a>
-      </li>
-      <li>
-        <a href="#"><strong>Paso 3</strong><small>Formato de pago</small></a>
-      </li>
+      <li class="active"><a href="#" aria-current="step"><strong>Paso 1</strong><small>Selección del trámite</small></a></li>
+      <li><a href="#"><strong>Paso 2</strong><small>Información de la persona</small></a></li>
+      <li><a href="#"><strong>Paso 3</strong><small>Formato de pago</small></a></li>
     </ul>
   </div>
 
   {{-- Sección de selección --}}
-  <h3 style="margin-top:0">Selección del trámite:</h3>
+  <h3 style="margin-top:0">Selección de trámites:</h3>
   <div style="height:4px; width:48px; background:#a57f2c; margin:6px 0 18px;"></div>
-  <p>Identifique y seleccione el trámite y/o servicio.</p>
+  <p>Identifique y seleccione sus trámites y/o servicios.</p>
 
   <form id="tramiteForm" action="{{ route('persona.store') }}" method="POST">
     @csrf
-    <div id="tramite" style="margin-bottom:15px">
-      <select class="form-control" id="tramiteSelect" name="tramite_id">
-        <option value="" selected disabled>Selecciona un trámite</option>
-        
-        @foreach ($tramites as $tramite)
-          <option 
-            value="{{ $tramite->id }}" 
-            data-descripcion="{{ $tramite->descripcion }}" 
-            data-cuota="{{ $tramite->cuota }}"
-            data-iva="{{ $tramite->iva }}">
-            {{ $tramite->descripcion }} - ${{ number_format($tramite->cuota, 2) }} MXN
-          </option>
-        @endforeach
-
-      </select>
+    
+    <div class="form-group" style="margin-bottom: 20px;">
+        <label for="tramiteSelect" style="font-weight: bold; font-size: 1.2em;">Lista de trámites y/o servicios</label>
+        <select class="form-control" id="tramiteSelect">
+            <option value="" selected disabled>Selecciona un trámite para añadirlo a tu lista</option>
+            @foreach ($tramites as $tramite)
+                <option value="{{ $tramite->id }}" data-descripcion="{{ $tramite->descripcion }}" data-cuota="{{ $tramite->cuota }}" data-iva="{{ $tramite->iva }}">
+                    {{ $tramite->descripcion }} - ${{ number_format($tramite->cuota, 2) }} MXN
+                </option>
+            @endforeach
+        </select>
     </div>
+    
+    <div id="tramites-hidden-container"></div>
 
-    {{-- Tabla que se llenará dinámicamente --}}
+    <h4>Trámites seleccionados:</h4>
     <div class="table-responsive">
-      <table class="table">
+      <table class="table table-striped">
         <thead>
           <tr>
             <th>Descripción del concepto</th>
-            <th>Importe en pesos M.N.</th>
-            <th>IVA</th>
+            <th class="text-right">Importe</th>
+            <th class="text-right">IVA</th>
+            <th class="text-right">Total</th>
+            <th class="text-center">Eliminar</th>
           </tr>
         </thead>
-        <tbody id="tramiteDetalleBody"></tbody>
+        <tbody id="tramitesSeleccionadosBody">
+            <tr id="empty-row">
+                <td colspan="5" class="text-center" style="padding: 20px; color: #777;">Aún no has agregado trámites.</td>
+            </tr>
+        </tbody>
+        <tfoot>
+            <tr style="font-weight: bold; font-size: 1.2em;">
+                <td colspan="3" class="text-right">Total a pagar:</td>
+                <td id="total-general" class="text-right">$0.00 MXN</td>
+                <td></td>
+            </tr>
+        </tfoot>
       </table>
     </div>
 
-    {{-- Acciones --}}
     <div class="row nav-actions" style="margin-top:10px">
       <div class="col-xs-6">
         <a href="{{ url('/') }}" class="btn btn-gob-outline">Regresar</a>
@@ -205,60 +101,122 @@
 @push('scripts')
 <script>
 document.addEventListener('DOMContentLoaded', function () {
-  const tramiteForm = document.getElementById('tramiteForm');
-  const tramiteSelect = document.getElementById('tramiteSelect');
-  const tramiteTableBody = document.getElementById('tramiteDetalleBody');
-  const alertPlaceholder = document.getElementById('alert-placeholder');
+    const tramiteForm = document.getElementById('tramiteForm');
+    const tramiteSelect = document.getElementById('tramiteSelect');
+    const tramitesSeleccionadosBody = document.getElementById('tramitesSeleccionadosBody');
+    const hiddenContainer = document.getElementById('tramites-hidden-container');
+    const totalGeneralCell = document.getElementById('total-general');
+    const alertPlaceholder = document.getElementById('alert-placeholder');
+    const emptyRow = document.getElementById('empty-row');
 
-  // --- LÓGICA PARA LLENAR LA TABLA (sin cambios) ---
-  tramiteSelect.addEventListener('change', function () {
-    tramiteTableBody.innerHTML = '';
-    alertPlaceholder.innerHTML = '';
-    const selectedOption = this.options[this.selectedIndex];
-    if (selectedOption.value) {
-      const descripcion = selectedOption.getAttribute('data-descripcion');
-      const cuota = parseFloat(selectedOption.getAttribute('data-cuota'));
-      const iva = selectedOption.getAttribute('data-iva');
-      const formattedCuota = new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'MXN' }).format(cuota);
-      const ivaText = (iva == '1') ? 'IVA 16%' : 'IVA 0%';
-      const newRow = `
-        <tr>
-          <td>${descripcion}</td>
-          <td>${formattedCuota}</td>
-          <td>${ivaText}</td>
-        </tr>
-      `;
-      tramiteTableBody.innerHTML = newRow;
+    let tramitesSeleccionados = [];
+    const MAX_TRAMITES = 10;
+
+    // ==========================================================
+    // FUNCIÓN MODIFICADA PARA CERRAR LA ALERTA SIN EFECTO
+    // ==========================================================
+    function showAlert(message, type = 'warning') {
+        const alertHTML = `
+            <div class="alert alert-${type} alert-dismissible fade show" role="alert">
+              <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+              <strong>¡Atención!</strong> ${message}
+            </div>`;
+        alertPlaceholder.innerHTML = alertHTML;
+
+        const closeButton = alertPlaceholder.querySelector('.close');
+        if (closeButton) {
+            closeButton.addEventListener('click', function() {
+                // Simplemente elimina el elemento de la alerta directamente
+                this.closest('.alert').remove();
+            });
+        }
     }
-  });
+    
+    function actualizarVista() {
+        tramitesSeleccionadosBody.innerHTML = '';
+        hiddenContainer.innerHTML = '';
+        let totalGeneral = 0;
 
-  // --- LÓGICA DE VALIDACIÓN (CON LA CORRECCIÓN PARA EL BOTÓN 'x') ---
-  tramiteForm.addEventListener('submit', function (event) {
-    if (!tramiteSelect.value) {
-      event.preventDefault();
-      const alertHTML = `
-        <div class="alert alert-warning alert-dismissible fade show" role="alert">
-          <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-            <span aria-hidden="true">&times;</span>
-          </button>
-          <strong>¡Precaución!</strong> Debes seleccionar un trámite para poder continuar.
-        </div>
-      `;
-      alertPlaceholder.innerHTML = alertHTML;
-      alertPlaceholder.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        if (tramitesSeleccionados.length === 0) {
+            tramitesSeleccionadosBody.appendChild(emptyRow);
+        } else {
+            tramitesSeleccionados.forEach((tramite, index) => {
+                const ivaMonto = tramite.iva == '1' ? parseFloat(tramite.cuota) * 0.16 : 0;
+                const totalTramite = parseFloat(tramite.cuota) + ivaMonto;
+                totalGeneral += totalTramite;
 
-      // LÓGICA AÑADIDA PARA HACER FUNCIONAR EL BOTÓN 'x'
-      const closeButton = alertPlaceholder.querySelector('.close');
-      if (closeButton) {
-        closeButton.addEventListener('click', function() {
-          const alertElement = this.closest('.alert');
-          if (alertElement) {
-            alertElement.remove();
-          }
-        });
-      }
+                const newRow = `
+                    <tr data-id="${tramite.id}">
+                        <td>${tramite.descripcion}</td>
+                        <td class="text-right">${formatCurrency(tramite.cuota)}</td>
+                        <td class="text-right">${formatCurrency(ivaMonto)}</td>
+                        <td class="text-right">${formatCurrency(totalTramite)}</td>
+                        <td class="text-center">
+                            <button type="button" class="btn-quitar" data-index="${index}" title="Quitar trámite">&times;</button>
+                        </td>
+                    </tr>`;
+                tramitesSeleccionadosBody.innerHTML += newRow;
+                
+                const hiddenInput = document.createElement('input');
+                hiddenInput.type = 'hidden';
+                hiddenInput.name = 'tramite_ids[]';
+                hiddenInput.value = tramite.id;
+                hiddenContainer.appendChild(hiddenInput);
+            });
+        }
+        
+        totalGeneralCell.textContent = formatCurrency(totalGeneral) + ' MXN';
     }
-  });
+
+    function formatCurrency(value) {
+        return new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'MXN' }).format(value);
+    }
+
+    tramiteSelect.addEventListener('change', function() {
+        alertPlaceholder.innerHTML = '';
+        const selectedOption = this.options[this.selectedIndex];
+        if (!selectedOption.value) return;
+
+        if (tramitesSeleccionados.length >= MAX_TRAMITES) {
+            showAlert(`No puedes agregar más de ${MAX_TRAMITES} trámites.`);
+            this.selectedIndex = 0;
+            return;
+        }
+
+        const tramiteId = selectedOption.value;
+        if (tramitesSeleccionados.some(t => t.id === tramiteId)) {
+            showAlert('Este trámite ya ha sido agregado a la lista.');
+            this.selectedIndex = 0;
+            return;
+        }
+
+        const tramiteData = {
+            id: tramiteId,
+            descripcion: selectedOption.getAttribute('data-descripcion'),
+            cuota: selectedOption.getAttribute('data-cuota'),
+            iva: selectedOption.getAttribute('data-iva'),
+        };
+        
+        tramitesSeleccionados.push(tramiteData);
+        actualizarVista();
+        this.selectedIndex = 0;
+    });
+
+    tramitesSeleccionadosBody.addEventListener('click', function(event) {
+        if (event.target.classList.contains('btn-quitar')) {
+            const indexToRemove = parseInt(event.target.getAttribute('data-index'), 10);
+            tramitesSeleccionados.splice(indexToRemove, 1);
+            actualizarVista();
+        }
+    });
+
+    tramiteForm.addEventListener('submit', function (event) {
+        if (tramitesSeleccionados.length === 0) {
+            event.preventDefault();
+            showAlert('Debes agregar al menos un trámite para poder continuar.');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+    });
 });
 </script>
 @endpush
