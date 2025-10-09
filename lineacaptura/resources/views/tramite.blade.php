@@ -136,7 +136,7 @@
 
     <h4>Trámites seleccionados:</h4>
     {{-- SE ELIMINÓ EL DIV "table-responsive" Y SE AÑADIÓ LA CLASE "tabla-tramites" A LA TABLA --}}
-    <table class="table table-striped tabla-tramites">
+    <table class="table tabla-tramites">
       <thead>
         <tr>
           <th>Descripción del concepto</th>

@@ -27,19 +27,59 @@
       font-family: "Montserrat", "Open Sans", Arial, sans-serif;
     }
 
+    /* Eliminar TODO efecto hover/focus en header gob.mx */
+    header.main-header a:hover,
+    header.main-header a:focus,
+    header.main-header button:hover,
+    header.main-header button:focus,
+    .navbar a:hover,
+    .navbar a:focus,
+    .navbar button:hover,
+    .navbar button:focus,
+    .navbar-collapse a:hover,
+    .navbar-collapse a:focus,
+    .nav-item a:hover,
+    .nav-item a:focus,
+    .nav-link:hover,
+    .nav-link:focus {
+      background-color: transparent !important;
+      background: transparent !important;
+      box-shadow: none !important;
+      border: none !important;
+      outline: none !important;
+    }
+
+    /* Eliminar estilos de botones específicos del framework */
+    .btn-link:hover,
+    .btn-link:focus,
+    .btn-default:hover,
+    .btn-default:focus {
+      background-color: transparent !important;
+      background: transparent !important;
+      box-shadow: none !important;
+      border: none !important;
+    }
+
+    /* Forzar transparencia en TODOS los elementos del navbar */
+    nav[role="navigation"] *:hover,
+    nav[role="navigation"] *:focus {
+      background-color: transparent !important;
+      box-shadow: none !important;
+    }
+
     @media (max-width: 991px) {
-  .navbar-toggler {
-    align-self: flex-start !important;
-    margin-top: -4px !important;
-  }
-  
-  /* Opción 1: SVG inline con color blanco */
-  .navbar-toggler .navbar-toggler-icon,
-  button.navbar-toggler .navbar-toggler-icon,
-  span.navbar-toggler-icon {
-    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='white' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e") !important;
-  }
-}
+      .navbar-toggler {
+        align-self: flex-start !important;
+        margin-top: -4px !important;
+      }
+      
+      /* SVG inline con color blanco */
+      .navbar-toggler .navbar-toggler-icon,
+      button.navbar-toggler .navbar-toggler-icon,
+      span.navbar-toggler-icon {
+        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='white' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e") !important;
+      }
+    }
   </style>
 </head>
 <body>
