@@ -15,6 +15,82 @@
     .btn-gob-outline:hover, .btn-gob-outline:focus{ background:var(--gob-rojo) !important; color:#fff !important; border-color:var(--gob-rojo) !important; box-shadow:none !important; text-decoration:none !important; outline: none !important; }
     .btn-quitar { color: #a94442; background: transparent; border: none; font-size: 1.5em; line-height: 1; padding: 0 5px; cursor: pointer; }
     .btn-quitar:hover { color: #7a2b29; }
+    
+    /* ========================================================== */
+    /* INICIO DE LAS CORRECCIONES DE RESPONSIVIDAD                */
+    /* ========================================================== */
+    @media (max-width: 767px) {
+        /* Ocultamos los encabezados originales de la tabla */
+        .tabla-tramites thead {
+            display: none;
+        }
+        /* Ocultamos el pie de tabla original */
+        .tabla-tramites tfoot {
+            display: none;
+        }
+        /* Convertimos cada fila en un bloque separado (como una tarjeta) */
+        .tabla-tramites tr {
+            display: block;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            margin-bottom: 20px;
+            padding: 15px;
+        }
+        /* Convertimos cada celda en un bloque y alineamos el contenido */
+        .tabla-tramites td {
+            display: block;
+            text-align: right;
+            position: relative;
+            padding-left: 50%;
+            border-bottom: 1px solid #eee;
+            padding-top: 10px;
+            padding-bottom: 10px;
+            word-wrap: break-word;
+        }
+        /* La primera celda (Descripción) se trata como un título */
+        .tabla-tramites td:first-child {
+            padding-left: 0;
+            text-align: left;
+            font-weight: bold;
+            font-size: 1.1em;
+            border-bottom: 1px solid #ccc;
+            margin-bottom: 10px;
+        }
+        /* Se añade la etiqueta de texto antes del contenido para las demás celdas */
+        .tabla-tramites td:not(:first-child):not(:last-child)::before {
+            content: attr(data-label);
+            position: absolute;
+            left: 0;
+            font-weight: 600;
+            color: #555;
+            text-align: left;
+        }
+        /* Ocultamos la etiqueta para la descripción */
+        .tabla-tramites td:first-child::before {
+            display: none;
+        }
+        /* Estilo especial para la celda del botón de eliminar */
+        .tabla-tramites td:last-child {
+            border-bottom: none;
+            padding: 10px 0 0;
+            text-align: right;
+        }
+        .tabla-tramites td:last-child::before {
+            display: none;
+        }
+
+    }
+
+    @media (max-width:575px){
+      #pasos .nav-pills{ flex-direction:column; align-items:center; flex-wrap:nowrap; }
+      #pasos .nav-pills>li>a{ width:100%; max-width:280px; min-width:240px; }
+      .nav-actions .btn{ width:100%; display:inline-block; }
+      .nav-actions .col-xs-6{ width:100%; float:none; }
+      .nav-actions .col-xs-6 + .col-xs-6{ margin-top:10px; text-align:center; }
+    }
+    /* ========================================================== */
+    /* FIN DE LAS CORRECCIONES                                    */
+    /* ========================================================== */
   </style>
 
   {{-- Breadcrumb --}}
@@ -59,31 +135,30 @@
     <div id="tramites-hidden-container"></div>
 
     <h4>Trámites seleccionados:</h4>
-    <div class="table-responsive">
-      <table class="table table-striped">
-        <thead>
-          <tr>
-            <th>Descripción del concepto</th>
-            <th class="text-right">Importe</th>
-            <th class="text-right">IVA</th>
-            <th class="text-right">Total</th>
-            <th class="text-center">Eliminar</th>
+    {{-- SE ELIMINÓ EL DIV "table-responsive" Y SE AÑADIÓ LA CLASE "tabla-tramites" A LA TABLA --}}
+    <table class="table table-striped tabla-tramites">
+      <thead>
+        <tr>
+          <th>Descripción del concepto</th>
+          <th class="text-right">Importe</th>
+          <th class="text-right">IVA</th>
+          <th class="text-right">Total</th>
+          <th class="text-center">Eliminar</th>
+        </tr>
+      </thead>
+      <tbody id="tramitesSeleccionadosBody">
+          <tr id="empty-row">
+              <td colspan="5" class="text-center" style="padding: 20px; color: #777;">Aún no has agregado trámites.</td>
           </tr>
-        </thead>
-        <tbody id="tramitesSeleccionadosBody">
-            <tr id="empty-row">
-                <td colspan="5" class="text-center" style="padding: 20px; color: #777;">Aún no has agregado trámites.</td>
-            </tr>
-        </tbody>
-        <tfoot>
-            <tr style="font-weight: bold; font-size: 1.2em;">
-                <td colspan="3" class="text-right">Total a pagar:</td>
-                <td id="total-general" class="text-right">$0.00 MXN</td>
-                <td></td>
-            </tr>
-        </tfoot>
-      </table>
-    </div>
+      </tbody>
+      <tfoot>
+          <tr style="font-weight: bold; font-size: 1.2em;">
+              <td colspan="3" class="text-right">Total a pagar:</td>
+              <td id="total-general" class="text-right">$0.00 MXN</td>
+              <td></td>
+          </tr>
+      </tfoot>
+    </table>
 
     <div class="row nav-actions" style="margin-top:10px">
       <div class="col-xs-6">
@@ -111,10 +186,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     let tramitesSeleccionados = [];
     const MAX_TRAMITES = 10;
-
-    // ==========================================================
-    // FUNCIÓN MODIFICADA PARA CERRAR LA ALERTA SIN EFECTO
-    // ==========================================================
+    
     function showAlert(message, type = 'warning') {
         const alertHTML = `
             <div class="alert alert-${type} alert-dismissible fade show" role="alert">
@@ -126,7 +198,6 @@ document.addEventListener('DOMContentLoaded', function () {
         const closeButton = alertPlaceholder.querySelector('.close');
         if (closeButton) {
             closeButton.addEventListener('click', function() {
-                // Simplemente elimina el elemento de la alerta directamente
                 this.closest('.alert').remove();
             });
         }
@@ -144,14 +215,15 @@ document.addEventListener('DOMContentLoaded', function () {
                 const ivaMonto = tramite.iva == '1' ? parseFloat(tramite.cuota) * 0.16 : 0;
                 const totalTramite = parseFloat(tramite.cuota) + ivaMonto;
                 totalGeneral += totalTramite;
-
+                
+                // === SE AÑADIERON LOS ATRIBUTOS data-label A CADA CELDA ===
                 const newRow = `
                     <tr data-id="${tramite.id}">
-                        <td>${tramite.descripcion}</td>
-                        <td class="text-right">${formatCurrency(tramite.cuota)}</td>
-                        <td class="text-right">${formatCurrency(ivaMonto)}</td>
-                        <td class="text-right">${formatCurrency(totalTramite)}</td>
-                        <td class="text-center">
+                        <td data-label="Descripción del concepto">${tramite.descripcion}</td>
+                        <td data-label="Importe" class="text-right">${formatCurrency(tramite.cuota)}</td>
+                        <td data-label="IVA" class="text-right">${formatCurrency(ivaMonto)}</td>
+                        <td data-label="Total" class="text-right">${formatCurrency(totalTramite)}</td>
+                        <td data-label="Eliminar" class="text-center">
                             <button type="button" class="btn-quitar" data-index="${index}" title="Quitar trámite">&times;</button>
                         </td>
                     </tr>`;

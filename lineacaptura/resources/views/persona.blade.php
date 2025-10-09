@@ -236,7 +236,7 @@ document.addEventListener('DOMContentLoaded', function () {
                   <button type="button" class="close" data-dismiss="alert" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                   </button>
-                  <strong>¡Precaución!</strong> Debes seleccionar un tipo de persona para poder continuar.
+                  <strong>¡Atención!</strong> Debes seleccionar un tipo de persona para poder continuar.
                 </div>
             `;
             alertPlaceholder.innerHTML = alertHTML;

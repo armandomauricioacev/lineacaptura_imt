@@ -13,85 +13,96 @@
     .btn-gob-outline{ background:#fff !important; color:var(--gob-rojo) !important; border:2px solid var(--gob-rojo) !important; box-shadow:none !important; text-decoration:none !important; }
     .btn-gob-outline:hover, .btn-gob-outline:focus{ background:var(--gob-rojo) !important; color:#fff !important; border-color:var(--gob-rojo) !important; box-shadow:none !important; text-decoration:none !important; outline: none !important; }
     
+    /* Estilos generales de la vista */
+    .equal-panels { display: flex; flex-wrap: wrap; margin-bottom: 20px; }
+    .equal-panels > [class*="col-"] { display: flex; padding-left: 10px; padding-right: 10px; }
+    .caja { border:1px solid #e5e5e5; border-radius:6px; padding:16px; background:#fff; width: 100%; }
+    .resumen.dl-horizontal dt { color: #555; font-weight: 600; width: 160px; text-align: left; white-space: normal; }
+    .resumen.dl-horizontal dd { margin-left: 180px; margin-bottom: 10px; text-align: left; }
+    .total-container { text-align: center; margin-top: 20px; padding: 20px; border-top: 1px solid #eee; }
+    .total-container .total-label { font-size: 1.5em; color: #333; font-weight: normal; }
+    .total-container .total-amount { font-size: 2em; color: #000; font-weight: normal; display: block; margin-top: 5px; }
+    .table > thead > tr > th { font-weight: 600; color: #555; }
+
     /* ========================================================== */
-    /* INICIO DE MODIFICACIONES CSS                               */
+    /* INICIO DE LAS CORRECCIONES DE RESPONSIVIDAD                */
     /* ========================================================== */
 
-    /* 1. Contenedor para alinear cajas horizontalmente */
-    .equal-panels {
-        display: flex;
-        flex-wrap: wrap;
-        margin-bottom: 20px;
-    }
-    .equal-panels > [class*="col-"] {
-        display: flex;
-        padding-left: 10px;
-        padding-right: 10px;
-    }
-    .caja {
-        border:1px solid #e5e5e5;
-        border-radius:6px;
-        padding:16px;
-        background:#fff;
-        width: 100%;
-    }
-
-    /* 2. Ajustes para la lista de descripción (datos de persona) */
-    .resumen.dl-horizontal dt {
-        color: #555;
-        font-weight: 600; /* Semi-negrita */
-        width: 160px;
-        text-align: left;
-        white-space: normal;
-    }
-    .resumen.dl-horizontal dd {
-        margin-left: 180px;
-        margin-bottom: 10px;
-        text-align: left;
-    }
-
-    /* 3. Estilo para el total general fuera de los recuadros */
-    .total-container {
-        text-align: center;
-        margin-top: 20px;
-        padding: 20px;
-        border-top: 1px solid #eee;
-    }
-    .total-container .total-label {
-        font-size: 1.5em;
-        color: #333;
-        font-weight: normal; /* Se quita la negrita */
-    }
-    .total-container .total-amount {
-        font-size: 2em;
-        color: #000;
-        font-weight: normal; /* Se quita la negrita */
-        display: block;
-        margin-top: 5px;
-    }
-
-    /* 4. Estilo de los encabezados de la tabla para que coincidan con los de 'Datos de la persona' */
-    .table > thead > tr > th {
-        font-weight: 600; /* Semi-negrita, igual que dt */
-        color: #555;     /* Mismo color que dt */
-    }
-    
-    /* Ajustes para móviles */
+    /* Apila las dos cajas principales en pantallas medianas */
     @media (max-width: 991px) {
         .equal-panels > [class*="col-"] {
             margin-bottom: 20px;
         }
     }
+    
+    /* Ajustes para móviles (tablets pequeñas y teléfonos) */
     @media (max-width: 767px) {
-        .resumen.dl-horizontal dt { float: none; width: auto; }
-        .resumen.dl-horizontal dd { margin-left: 0; }
+        /* Ajuste para la lista de 'Datos de la persona' */
+        .resumen.dl-horizontal dt { float: none; width: auto; font-weight: bold; }
+        .resumen.dl-horizontal dd { margin-left: 0; margin-bottom: 15px; }
+        
+        /* === ESTILOS MEJORADOS PARA LA TABLA RESPONSIVA === */
+        .tabla-tramites thead {
+            display: none;
+        }
+        .tabla-tramites tr {
+            display: block;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            margin-bottom: 20px;
+            padding: 15px;
+        }
+        .tabla-tramites td {
+            display: block;
+            text-align: right;
+            position: relative;
+            padding-left: 50%;
+            border-bottom: 1px solid #eee;
+            padding-top: 10px;
+            padding-bottom: 10px;
+            word-wrap: break-word;
+        }
+        .tabla-tramites td:last-child {
+            border-bottom: none;
+        }
+        /* La primera celda (Descripción) se trata como un título */
+        .tabla-tramites td:first-child {
+            padding-left: 0;
+            text-align: left;
+            font-weight: bold;
+            font-size: 1.1em;
+            border-bottom: 1px solid #ccc;
+            margin-bottom: 10px;
+        }
+        /* Se añade la etiqueta de texto antes del contenido para las demás celdas */
+        .tabla-tramites td:not(:first-child)::before {
+            content: attr(data-label);
+            position: absolute;
+            left: 0;
+            font-weight: 600;
+            color: #555;
+            text-align: left;
+        }
+        /* Ocultamos la etiqueta para la descripción, ya que es el título */
+        .tabla-tramites td:first-child::before {
+            display: none;
+        }
+    }
+
+    /* Ajustes para los pasos y botones en móviles */
+    @media (max-width:575px){
+      #pasos .nav-pills{ flex-direction:column; align-items:center; flex-wrap:nowrap; }
+      #pasos .nav-pills>li>a{ width:100%; max-width:280px; min-width:240px; }
+      .nav-actions .btn{ width:100%; display:inline-block; }
+      .nav-actions .col-xs-6{ width:100%; float:none; }
+      .nav-actions .col-xs-6 + .col-xs-6{ margin-top:10px; text-align:center; }
     }
     /* ========================================================== */
-    /* FIN DE MODIFICACIONES CSS                                  */
+    /* FIN DE LAS CORRECCIONES                                    */
     /* ========================================================== */
   </style>
   
-  {{-- Breadcrumb, Título y Pasos (sin cambios) --}}
+  {{-- Breadcrumb, Título y Pasos --}}
   <ol class="breadcrumb" style="margin-top:10px">
     <li><a href="{{ url('/') }}">Inicio</a></li>
     <li><a href="{{ url('/persona') }}">Instituto Mexicano del Transporte</a></li>
@@ -134,45 +145,44 @@
         <div class="caja">
             <center><h4>Trámites seleccionados</h4></center>
             <hr>
-            <div class="table-responsive">
-                <table class="table">
-                    <thead>
+            {{-- SE ELIMINÓ EL DIV "table-responsive" QUE CAUSABA EL SCROLL --}}
+            <table class="table tabla-tramites">
+                <thead>
+                    <tr>
+                        <th>Descripción</th>
+                        <th class="text-right">Cuota</th>
+                        <th class="text-right">IVA</th>
+                        <th class="text-right">Total</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @php $totalGeneral = 0; @endphp
+                    @foreach($tramites as $tramite)
+                        @php
+                            $montoIva = $tramite->iva ? round($tramite->cuota * 0.16, 2) : 0;
+                            $totalTramite = $tramite->cuota + $montoIva;
+                            $totalGeneral += $totalTramite;
+                        @endphp
                         <tr>
-                            <th>Descripción</th>
-                            <th class="text-right">Cuota</th>
-                            <th class="text-right">IVA</th>
-                            <th class="text-right">Total</th>
+                            <td data-label="Descripción">{{ $tramite->descripcion }}</td>
+                            <td data-label="Cuota" class="text-right">${{ number_format($tramite->cuota, 2) }}</td>
+                            <td data-label="IVA" class="text-right">${{ number_format($montoIva, 2) }}</td>
+                            <td data-label="Total" class="text-right">${{ number_format($totalTramite, 2) }}</td>
                         </tr>
-                    </thead>
-                    <tbody>
-                        @php $totalGeneral = 0; @endphp
-                        @foreach($tramites as $tramite)
-                            @php
-                                $montoIva = $tramite->iva ? round($tramite->cuota * 0.16, 2) : 0;
-                                $totalTramite = $tramite->cuota + $montoIva;
-                                $totalGeneral += $totalTramite;
-                            @endphp
-                            <tr>
-                                <td>{{ $tramite->descripcion }}</td>
-                                <td class="text-right">${{ number_format($tramite->cuota, 2) }}</td>
-                                <td class="text-right">${{ number_format($montoIva, 2) }}</td>
-                                <td class="text-right">${{ number_format($totalTramite, 2) }}</td>
-                            </tr>
-                        @endforeach
-                    </tbody>
-                </table>
-            </div>
+                    @endforeach
+                </tbody>
+            </table>
         </div>
     </div>
   </div>
 
-  {{-- Nuevo contenedor para el total general --}}
+  {{-- Contenedor para el total general --}}
   <div class="total-container">
     <span class="total-label">Importe total a pagar:</span>
     <span class="total-amount">${{ number_format($totalGeneral, 2) }} MXN</span>
   </div>
 
-  {{-- Acciones (sin cambios) --}}
+  {{-- Acciones --}}
   <div class="row nav-actions" style="margin-top:16px">
     <div class="col-xs-6">
       <a href="{{ url('/persona') }}" class="btn btn-gob-outline" aria-label="Regresar al paso anterior">Regresar</a>
