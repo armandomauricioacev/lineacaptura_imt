@@ -11,7 +11,9 @@ use App\Http\Controllers\Auth\VerifyEmailController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware('guest')->group(function () {
-    // URL SECRETA: Redirige al login
+    // ============================================================
+    // URL SECRETA PARA LOGIN
+    // ============================================================
     Route::get('ipanelmadmint', function () {
         // Marcar en la sesión que vino desde la URL correcta
         session(['from_secret_url' => true]);
@@ -31,17 +33,45 @@ Route::middleware('guest')->group(function () {
     // Procesa el login (POST)
     Route::post('admin-login-form', [AuthenticatedSessionController::class, 'store']);
 
-    Route::post('register', [RegisteredUserController::class, 'store']);
+    // ============================================================
+    // URL SECRETA PARA REGISTRO
+    // ============================================================
+    Route::get('icrearmadmint', function () {
+        // Marcar en la sesión que vino desde la URL correcta de registro
+        session(['from_secret_register_url' => true]);
+        return redirect('/admin-register-form');
+    });
 
-    Route::get('forgot-password', [PasswordResetLinkController::class, 'create'])
-        ->name('password.request');
+    // Registro real (URL oculta) - Solo accesible si viene de icrearmadmint
+    Route::get('admin-register-form', function () {
+        // Verificar que vino desde la URL secreta de registro
+        if (!session('from_secret_register_url')) {
+            abort(404); // Si no vino de icrearmadmint, mostrar 404
+        }
+        session()->forget('from_secret_register_url'); // Limpiar la marca
+        return app(RegisteredUserController::class)->create();
+    })->name('register');
 
+    // Procesa el registro (POST)
+    Route::post('admin-register-form', [RegisteredUserController::class, 'store']);
+
+    // ============================================================
+    // RUTAS DE RECUPERACIÓN DE CONTRASEÑA
+    // ============================================================
+    Route::get('forgot-password', function () {
+        // Verifica si la solicitud proviene del formulario de login
+        if (!session('from_login_page')) {
+            abort(404); // Bloquear el acceso directo a la URL
+        }
+        return (new PasswordResetLinkController)->create();  // Corregido aquí
+    })->name('password.request');
+
+    // Al hacer clic en "Olvidé mi contraseña" en el login, marcamos la sesión
     Route::post('forgot-password', [PasswordResetLinkController::class, 'store'])
         ->name('password.email');
 
     Route::get('reset-password/{token}', [NewPasswordController::class, 'create'])
         ->name('password.reset');
-
     Route::post('reset-password', [NewPasswordController::class, 'store'])
         ->name('password.store');
 });

@@ -39,8 +39,10 @@ Route::get('/{any}', function ($any) {
         'administrador', 
         'dashboard', 
         'panel', 
-        'admin-login-form',      // ← BLOQUEADO
-        'admin-dashboard-panel'   // ← BLOQUEADO
+        'admin-login-form',        // ← BLOQUEADO
+        'admin-register-form',     // ← BLOQUEADO (NUEVO)
+        'admin-dashboard-panel',
+        'forgot-password',
     ];
     
     if (in_array($any, $blocked)) {
