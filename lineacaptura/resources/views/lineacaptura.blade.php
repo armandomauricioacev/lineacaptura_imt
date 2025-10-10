@@ -51,3 +51,28 @@
 </div>
 <br>
 @endsection
+
+{{-- ========================================================== --}}
+{{-- INICIO DE LA CORRECCIÓN                                    --}}
+{{-- ========================================================== --}}
+@push('scripts')
+<script>
+    (function () {
+        // 1. Añade una entrada "falsa" al historial del navegador.
+        // Esto crea una "trampa". Cuando el usuario presione "atrás",
+        // volverá a esta misma página, pero activará el evento 'popstate'.
+        history.pushState(null, document.title, location.href);
+
+        // 2. Escucha el evento 'popstate', que se dispara con el botón de retroceso.
+        window.addEventListener('popstate', function (event) {
+            // 3. En lugar de permitir que el navegador regrese, forzamos una
+            // redirección a la página de inicio.
+            // Usamos 'replace' para que el usuario no pueda volver a esta página con "adelante".
+            window.location.replace("{{ url('/inicio') }}");
+        });
+    })();
+</script>
+@endpush
+{{-- ========================================================== --}}
+{{-- FIN DE LA CORRECCIÓN                                       --}}
+{{-- ========================================================== --}}

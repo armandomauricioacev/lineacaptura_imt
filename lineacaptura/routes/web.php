@@ -1,44 +1,51 @@
 <?php
 
 use App\Http\Controllers\LineaCapturaController;
+use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 
-// Redirigir la ruta raíz (/) a /inicio
 Route::get('/', function () {
     return redirect('/inicio');
 });
 
-// Ruta para mostrar la vista de inicio con las dependencias
-Route::get('/inicio', [LineaCapturaController::class, 'index']);
+Route::get('/inicio', [LineaCapturaController::class, 'index'])->name('inicio');
 
-// Ruta para mostrar los trámites de una dependencia específica
-Route::match(['get', 'post'], '/tramite', [LineaCapturaController::class, 'showTramite'])->name('tramite');
+Route::middleware(['web', 'ensure.step'])->group(function () {
+    Route::get('/tramite', [LineaCapturaController::class, 'showTramite'])->name('tramite.show');
+    Route::get('/persona', [LineaCapturaController::class, 'showPersonaForm'])->name('persona.show');
+    Route::get('/pago', [LineaCapturaController::class, 'showPagoPage'])->name('pago.show');
+});
 
-// POST para guardar la selección del trámite (desde /tramite) y redirigir
+Route::post('/tramite', [LineaCapturaController::class, 'showTramite'])->name('tramite.store');
 Route::post('/persona', [LineaCapturaController::class, 'storeTramiteSelection'])->name('persona.store');
-// GET para mostrar el formulario de la persona (al regresar o después de la redirección)
-Route::get('/persona', [LineaCapturaController::class, 'showPersonaForm'])->name('persona.show');
-
-// Recibe los datos de la persona (desde /persona) y los guarda en sesión
 Route::post('/pago', [LineaCapturaController::class, 'storePersonaData'])->name('pago.store');
-
-// Muestra la página de resumen/pago con toda la información
-Route::get('/pago', [LineaCapturaController::class, 'showPagoPage'])->name('pago.show');
-
-// Recibe la petición final para generar la línea de captura
 Route::post('/generar-linea', [LineaCapturaController::class, 'generarLineaCaptura'])->name('linea.generar');
 
-/*
-|--------------------------------------------------------------------------
-| Rutas de Administración Protegidas
-|--------------------------------------------------------------------------
-|
-| Esta ruta ahora está protegida. Laravel se encargará de pedir
-| un inicio de sesión antes de permitir el acceso.
-|
-*/
-Route::middleware(['auth'])->group(function () {
-    Route::get('/ipanelmadmint', function () {
-        return view('ipanelmadmint');
-    })->name('admin.panel');
+Route::middleware('auth')->group(function () {
+    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
+    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
+
+require __DIR__.'/auth.php';
+
+// BLOQUEAR URLs PROHIBIDAS - debe ir ANTES de la ruta catch-all
+Route::get('/{any}', function ($any) {
+    // Lista de URLs prohibidas (acceso directo bloqueado)
+    $blocked = [
+        'login', 
+        'register', 
+        'admin', 
+        'administrador', 
+        'dashboard', 
+        'panel', 
+        'admin-login-form',      // ← BLOQUEADO
+        'admin-dashboard-panel'   // ← BLOQUEADO
+    ];
+    
+    if (in_array($any, $blocked)) {
+        abort(404); // Mostrar 404 en lugar de redirigir
+    }
+    
+    abort(404);
+})->where('any', '.*');

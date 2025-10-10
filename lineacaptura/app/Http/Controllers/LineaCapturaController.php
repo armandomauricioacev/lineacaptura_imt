@@ -10,9 +10,11 @@ use Carbon\Carbon;
 
 class LineaCapturaController extends Controller
 {
-    // ... (index, showTramite, storeTramiteSelection, showPersonaForm, storePersonaData se mantienen igual) ...
-    public function index()
+    public function index(Request $request)
     {
+        // Limpiamos la sesión del progreso anterior para forzar a empezar de nuevo.
+        $request->session()->forget(['dependenciaId', 'tramites_seleccionados', 'persona_data']);
+
         $dependencias = Dependencia::all();
         return view('inicio', ['dependencias' => $dependencias]);
     }
@@ -22,8 +24,17 @@ class LineaCapturaController extends Controller
         if ($request->isMethod('post')) {
             $request->validate(['dependenciaId' => 'required|integer|exists:dependencias,id']);
             $request->session()->put('dependenciaId', $request->input('dependenciaId'));
-            return redirect()->route('tramite');
+            
+            // ==========================================================
+            // INICIO DE LA CORRECCIÓN
+            // Se redirige a 'tramite.show' en lugar de 'tramite'.
+            // ==========================================================
+            return redirect()->route('tramite.show');
+            // ==========================================================
+            // FIN DE LA CORRECCIÓN
+            // ==========================================================
         }
+        
         $dependenciaId = $request->session()->get('dependenciaId');
         if (!$dependenciaId) {
             return redirect('/inicio');
@@ -50,8 +61,9 @@ class LineaCapturaController extends Controller
 
     public function showPersonaForm(Request $request)
     {
+        // Se ha dejado la validación original aquí, ya que el middleware 'ensure.step' ya protege esta ruta.
         if (!$request->session()->has('dependenciaId') || !$request->session()->has('tramites_seleccionados')) {
-            return redirect('/tramite')->with('error', 'Por favor, selecciona al menos un trámite primero.');
+            return redirect()->route('tramite.show')->with('error', 'Por favor, selecciona al menos un trámite primero.');
         }
         return view('persona');
     }
@@ -104,7 +116,6 @@ class LineaCapturaController extends Controller
             return redirect('/inicio')->with('error', 'Tu sesión ha expirado, por favor inicia de nuevo.');
         }
 
-        // CORRECCIÓN: No se llama a with('transacciones')
         $dependencia = Dependencia::findOrFail($dependenciaId);
         $tramites = Tramite::whereIn('id', $tramiteIds)->get();
 
@@ -180,10 +191,8 @@ class LineaCapturaController extends Controller
         return ['Tramite' => $tramitesArray];
     }
     
-    // CORRECCIÓN: Esta función ahora no depende de la relación del modelo.
     private function buildConcepto(int $secuencia, string $tipoAgrupador, Tramite $tramite, float $monto, string $claveConcepto = null): array
     {
-        // Se vuelve a la lógica de definir las claves de transacción directamente aquí.
         $transacciones = [
             ['ClaveTransaccion' => '4011', 'ValorTransaccion' => $monto],
             ['ClaveTransaccion' => '4243', 'ValorTransaccion' => $monto],

@@ -10,9 +10,17 @@ return Application::configure(basePath: dirname(__DIR__))
         commands: __DIR__.'/../routes/console.php',
         health: '/up',
     )
-    ->withMiddleware(function (Middleware $middleware): void {
-        //
+    ->withMiddleware(function (Middleware $middleware) {
+        $middleware->alias([
+            'ensure.step' => \App\Http\Middleware\EnsureValidStep::class,
+        ]);
+
+        // Redirigir usuarios no autenticados al login (usar URL directa, NO route())
+        $middleware->redirectGuestsTo('/admin-login-form');
+        
+        // Después del login exitoso, ir al panel admin (usar URL directa, NO route())
+        $middleware->redirectUsersTo('/admin-dashboard-panel');
     })
-    ->withExceptions(function (Exceptions $exceptions): void {
+    ->withExceptions(function (Exceptions $exceptions) {
         //
     })->create();
