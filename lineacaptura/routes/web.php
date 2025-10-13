@@ -21,6 +21,15 @@ Route::post('/persona', [LineaCapturaController::class, 'storeTramiteSelection']
 Route::post('/pago', [LineaCapturaController::class, 'storePersonaData'])->name('pago.store');
 Route::post('/generar-linea', [LineaCapturaController::class, 'generarLineaCaptura'])->name('linea.generar');
 
+// ==========================================================
+// INICIO DE LA MODIFICACIÓN
+// Nueva ruta para manejar el retroceso de forma segura.
+// ==========================================================
+Route::post('/regresar', [LineaCapturaController::class, 'regresar'])->name('regresar');
+// ==========================================================
+// FIN DE LA MODIFICACIÓN
+// ==========================================================
+
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
@@ -40,7 +49,7 @@ Route::get('/{any}', function ($any) {
         'dashboard', 
         'panel', 
         'admin-login-form',        // ← BLOQUEADO
-        'admin-register-form',     // ← BLOQUEADO (NUEVO)
+        'admin-register-form',     // ← BLOQUEADO
         'admin-dashboard-panel',
         'forgot-password',
     ];

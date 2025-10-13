@@ -30,7 +30,7 @@
   {{-- Breadcrumb --}}
   <ol class="breadcrumb" style="margin-top:10px">
     <li><a href="{{ url('/') }}">Inicio</a></li>
-    <li><a href="{{ url('/tramite') }}">Instituto Mexicano del Transporte</a></li>
+    <li>Instituto Mexicano del Transporte</li>
   </ol>
 
   {{-- Contenedor para la alerta --}}
@@ -53,6 +53,11 @@
   <h3 style="margin-top:0">Información de la persona:</h3>
   <div style="height:4px; width:48px; background:#a57f2c; margin:6px 0 18px;"></div>
 
+  {{-- ========================================================== --}}
+  {{-- INICIO DE LA CORRECCIÓN                                    --}}
+  {{-- Se movió el cierre del formulario para después de los      --}}
+  {{-- campos de entrada, pero ANTES de los botones de navegación.--}}
+  {{-- ========================================================== --}}
   <form id="personaForm" action="{{ route('pago.store') }}" method="POST" role="form" aria-label="Formulario de datos de la persona" novalidate>
     @csrf
     {{-- Tipo de persona --}}
@@ -134,17 +139,32 @@
         </div>
       </div>
     </div>
-
-    {{-- Navegación --}}
-    <div class="row nav-actions" style="margin-top:10px">
-      <div class="col-xs-6">
-        <a href="{{ url('/tramite') }}" class="btn btn-gob-outline" aria-label="Regresar al paso anterior">Regresar</a>
-      </div>
-      <div class="col-xs-6 text-right">
-        <button type="submit" class="btn btn-gob-outline" id="btn-continuar" aria-label="Continuar al formato de pago">Siguiente</button>
-      </div>
-    </div>
   </form>
+  {{-- ========================================================== --}}
+  {{-- FIN DE LA CORRECCIÓN                                     --}}
+  {{-- ========================================================== --}}
+
+  {{-- Navegación --}}
+  <div class="row nav-actions" style="margin-top:10px">
+    <div class="col-xs-6">
+      <form action="{{ route('regresar') }}" method="POST" style="display: inline;">
+          @csrf
+          <input type="hidden" name="paso_actual" value="persona">
+          <button type="submit" class="btn btn-gob-outline" aria-label="Regresar al paso anterior">Regresar</button>
+      </form>
+    </div>
+    <div class="col-xs-6 text-right">
+        {{-- ========================================================== --}}
+        {{-- INICIO DE LA CORRECCIÓN                                    --}}
+        {{-- Se añade el atributo 'form' para vincular este botón      --}}
+        {{-- con el formulario de arriba, que ahora está separado.   --}}
+        {{-- ========================================================== --}}
+      <button type="submit" class="btn btn-gob-outline" id="btn-continuar" form="personaForm" aria-label="Continuar al formato de pago">Siguiente</button>
+      {{-- ========================================================== --}}
+      {{-- FIN DE LA CORRECCIÓN                                     --}}
+      {{-- ========================================================== --}}
+    </div>
+  </div>
 
   <p style="margin-top:15px; color:#777; font-size:12px">* Campos obligatorios</p>
 @endsection
@@ -159,7 +179,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const uppercaseInputs = document.querySelectorAll('.to-uppercase');
     const alertPlaceholder = document.getElementById('alert-placeholder');
     
-    // --- Lógica para mostrar/ocultar campos (sin cambios) ---
+    // ... (El resto de tu script de validación se mantiene igual)
     function syncTipo() {
         const r = document.querySelector('input[name="tipo_persona"]:checked');
         pf.querySelectorAll('input').forEach(input => input.required = false);
@@ -186,7 +206,6 @@ document.addEventListener('DOMContentLoaded', function () {
     radios.forEach(r => r.addEventListener('change', syncTipo));
     syncTipo();
     
-    // --- Lógica de mayúsculas (sin cambios) ---
     uppercaseInputs.forEach(input => {
         input.addEventListener('input', function() {
             let originalValue = this.value;
@@ -200,7 +219,6 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     });
 
-    // --- Lógica de validación de campos (sin cambios) ---
     function showError(elementId, message) {
         const errorElement = document.getElementById(elementId + '-error');
         if (errorElement) {
@@ -217,15 +235,19 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
     
-    // --- Lógica principal del formulario al enviar ---
-    personaForm.addEventListener('submit', function(event) {
-        event.preventDefault(); // Siempre prevenimos el envío para validar
+    // ==========================================================
+    // INICIO DE LA CORRECCIÓN                                    
+    // Se cambia el listener para que apunte al botón 'Siguiente'
+    // en lugar de al formulario directamente.
+    // ==========================================================
+    document.getElementById('btn-continuar').addEventListener('click', function(event) {
+        event.preventDefault(); 
         
         let isValid = true;
         let firstErrorElement = null;
 
-        alertPlaceholder.innerHTML = ''; // Limpiar alerta grande
-        document.querySelectorAll('.error-message').forEach(el => el.style.display = 'none'); // Limpiar errores pequeños
+        alertPlaceholder.innerHTML = '';
+        document.querySelectorAll('.error-message').forEach(el => el.style.display = 'none');
 
         const tipoPersonaSeleccionado = document.querySelector('input[name="tipo_persona"]:checked');
         
@@ -240,10 +262,6 @@ document.addEventListener('DOMContentLoaded', function () {
                 </div>
             `;
             alertPlaceholder.innerHTML = alertHTML;
-            
-            // ==========================================================
-            // CAMBIO CLAVE: Hacer scroll a la alerta, no al campo.
-            // ==========================================================
             alertPlaceholder.scrollIntoView({ behavior: 'smooth', block: 'center' });
 
             const closeButton = alertPlaceholder.querySelector('.close');
@@ -269,19 +287,16 @@ document.addEventListener('DOMContentLoaded', function () {
                 }
             }
             
-            // Si hay errores en los campos, hacer scroll al primero de ellos
             if (!isValid && firstErrorElement) {
                 firstErrorElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
             }
         }
         
-        // Si después de todas las validaciones, todo es correcto, enviar el formulario
         if (isValid) {
             personaForm.submit();
         }
     });
 
-    // Validar en tiempo real al salir de un campo (sin cambios)
     document.querySelectorAll('#pf input[required], #pm input[required]').forEach(input => {
         input.addEventListener('blur', function() {
             if (!this.value.trim()) {
@@ -292,6 +307,12 @@ document.addEventListener('DOMContentLoaded', function () {
                 hideError(this.id);
             }
         });
+    });
+    
+    // Bloqueo de navegación del historial
+    history.pushState(null, document.title, location.href);
+    window.addEventListener('popstate', function () {
+        history.pushState(null, document.title, location.href);
     });
 });
 </script>

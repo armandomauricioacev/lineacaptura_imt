@@ -15,33 +15,35 @@ class EnsureValidStep
      */
     public function handle(Request $request, Closure $next): Response
     {
-        $routeName = $request->route()->getName();
+        $currentRouteName = $request->route()->getName();
+        $session = $request->session();
 
-        // Si el usuario intenta ir a la vista de trámites...
-        if ($routeName === 'tramite') {
-            // ...debe haber seleccionado una dependencia primero.
-            if (!$request->session()->has('dependenciaId')) {
-                return redirect()->route('inicio');
-            }
+        // Determina el paso "correcto" en el que el usuario DEBERÍA estar.
+        $correctStepRoute = 'inicio'; // Por defecto, todos deben estar en el inicio.
+
+        if ($session->has('dependenciaId') && !$session->has('tramites_seleccionados')) {
+            $correctStepRoute = 'tramite.show';
+        }
+        if ($session->has('tramites_seleccionados') && !$session->has('persona_data')) {
+            $correctStepRoute = 'persona.show';
+        }
+        if ($session->has('persona_data')) {
+            $correctStepRoute = 'pago.show';
         }
 
-        // Si el usuario intenta ir a la vista de persona...
-        if ($routeName === 'persona.show') {
-            // ...debe haber seleccionado al menos un trámite.
-            if (!$request->session()->has('tramites_seleccionados')) {
-                return redirect()->route('tramite');
-            }
+        // Excepción: Si el proceso ha finalizado, la única página válida es la de inicio.
+        if ($session->has('linea_capturada_finalizada')) {
+            $correctStepRoute = 'inicio';
         }
 
-        // Si el usuario intenta ir a la vista de pago...
-        if ($routeName === 'pago.show') {
-            // ...debe haber ingresado sus datos personales.
-            if (!$request->session()->has('persona_data')) {
-                return redirect()->route('persona.show');
-            }
+        // Si la ruta que el usuario intenta visitar NO es la que le corresponde...
+        if ($currentRouteName !== $correctStepRoute) {
+            // ...lo redirigimos a la fuerza a la página correcta.
+            // Esto bloquea cualquier intento de navegar con la URL.
+            return redirect()->route($correctStepRoute);
         }
-        
-        // Si todo está en orden, permite el paso.
+
+        // Si está en la página correcta, le permitimos continuar.
         return $next($request);
     }
 }

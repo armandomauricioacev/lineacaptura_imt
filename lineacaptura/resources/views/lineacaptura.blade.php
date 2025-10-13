@@ -44,7 +44,7 @@
 
 <div class="row nav-actions" style="margin-top:20px">
     <div class="col-xs-12 text-center">
-      <a href="{{ url('/') }}" class="btn btn-gob-outline" aria-label="Realizar otro trámite">
+      <a href="{{ route('inicio') }}" class="btn btn-gob-outline" aria-label="Realizar otro trámite">
         Realizar otro trámite
       </a>
     </div>
@@ -52,27 +52,15 @@
 <br>
 @endsection
 
-{{-- ========================================================== --}}
-{{-- INICIO DE LA CORRECCIÓN                                    --}}
-{{-- ========================================================== --}}
 @push('scripts')
 <script>
     (function () {
-        // 1. Añade una entrada "falsa" al historial del navegador.
-        // Esto crea una "trampa". Cuando el usuario presione "atrás",
-        // volverá a esta misma página, pero activará el evento 'popstate'.
+        // Previene que se pueda volver atrás en el historial del navegador.
+        // Al intentar retroceder, simplemente se recarga la página actual.
         history.pushState(null, document.title, location.href);
-
-        // 2. Escucha el evento 'popstate', que se dispara con el botón de retroceso.
-        window.addEventListener('popstate', function (event) {
-            // 3. En lugar de permitir que el navegador regrese, forzamos una
-            // redirección a la página de inicio.
-            // Usamos 'replace' para que el usuario no pueda volver a esta página con "adelante".
-            window.location.replace("{{ url('/inicio') }}");
+        window.addEventListener('popstate', function () {
+            history.pushState(null, document.title, location.href);
         });
     })();
 </script>
 @endpush
-{{-- ========================================================== --}}
-{{-- FIN DE LA CORRECCIÓN                                       --}}
-{{-- ========================================================== --}}

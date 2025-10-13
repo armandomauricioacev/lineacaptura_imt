@@ -13,7 +13,7 @@ class LineaCapturaController extends Controller
     public function index(Request $request)
     {
         // Limpiamos la sesión del progreso anterior para forzar a empezar de nuevo.
-        $request->session()->forget(['dependenciaId', 'tramites_seleccionados', 'persona_data']);
+        $request->session()->forget(['dependenciaId', 'tramites_seleccionados', 'persona_data', 'linea_capturada_finalizada']);
 
         $dependencias = Dependencia::all();
         return view('inicio', ['dependencias' => $dependencias]);
@@ -25,14 +25,7 @@ class LineaCapturaController extends Controller
             $request->validate(['dependenciaId' => 'required|integer|exists:dependencias,id']);
             $request->session()->put('dependenciaId', $request->input('dependenciaId'));
             
-            // ==========================================================
-            // INICIO DE LA CORRECCIÓN
-            // Se redirige a 'tramite.show' en lugar de 'tramite'.
-            // ==========================================================
             return redirect()->route('tramite.show');
-            // ==========================================================
-            // FIN DE LA CORRECCIÓN
-            // ==========================================================
         }
         
         $dependenciaId = $request->session()->get('dependenciaId');
@@ -61,7 +54,6 @@ class LineaCapturaController extends Controller
 
     public function showPersonaForm(Request $request)
     {
-        // Se ha dejado la validación original aquí, ya que el middleware 'ensure.step' ya protege esta ruta.
         if (!$request->session()->has('dependenciaId') || !$request->session()->has('tramites_seleccionados')) {
             return redirect()->route('tramite.show')->with('error', 'Por favor, selecciona al menos un trámite primero.');
         }
@@ -146,6 +138,8 @@ class LineaCapturaController extends Controller
         $lineaCapturada->save();
 
         $request->session()->flush();
+        $request->session()->put('linea_capturada_finalizada', true);
+
         return view('lineacaptura', [
             'lineaCapturada' => $lineaCapturada,
             'jsonParaSat' => json_encode($jsonArray, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE)
@@ -206,5 +200,31 @@ class LineaCapturaController extends Controller
             'TotalContribuciones' => $monto, 'TotalConcepto' => $monto,
             'DP' => ['TransaccionP' => $transacciones]
         ];
+    }
+
+    /**
+     * Maneja el retroceso controlado entre pasos, limpiando la sesión del paso actual.
+     */
+    public function regresar(Request $request)
+    {
+        $paso_actual = $request->input('paso_actual');
+
+        if ($paso_actual === 'tramite') {
+            $request->session()->forget('dependenciaId');
+            return redirect()->route('inicio');
+        }
+
+        if ($paso_actual === 'persona') {
+            $request->session()->forget('tramites_seleccionados');
+            return redirect()->route('tramite.show');
+        }
+
+        if ($paso_actual === 'pago') {
+            $request->session()->forget('persona_data');
+            return redirect()->route('persona.show');
+        }
+        
+        // Por defecto, o si algo falla, lo mandamos al inicio
+        return redirect()->route('inicio');
     }
 }

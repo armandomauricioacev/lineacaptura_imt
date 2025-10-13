@@ -71,13 +71,11 @@
           @foreach ($dependencias as $dependencia)
             <div>
               {{-- Al hacer clic, guardamos el ID de la dependencia en la sesión y redirigimos --}}
-              {{-- CORRECCIÓN 1: Se usa la ruta 'tramite.store' para el enlace que activa el formulario --}}
               <a href="{{ route('tramite.store') }}" style="text-decoration:underline;" 
                  onclick="event.preventDefault(); document.getElementById('dependencia-form-{{ $dependencia->id }}').submit();">
                 {{ $dependencia->nombre }}
               </a>
               {{-- Formulario oculto para guardar el ID de la dependencia --}}
-              {{-- CORRECCIÓN 2: El 'action' del formulario también apunta a 'tramite.store' --}}
               <form id="dependencia-form-{{ $dependencia->id }}" action="{{ route('tramite.store') }}" method="POST" style="display: none;">
                   @csrf
                   <input type="hidden" name="dependenciaId" value="{{ $dependencia->id }}">
@@ -93,3 +91,16 @@
     </div>
   </div>
 @endsection
+
+@push('scripts')
+<script>
+    (function () {
+        // Previene que se pueda volver atrás en el historial del navegador.
+        // Al intentar retroceder, simplemente se recarga la página actual.
+        history.pushState(null, document.title, location.href);
+        window.addEventListener('popstate', function () {
+            history.pushState(null, document.title, location.href);
+        });
+    })();
+</script>
+@endpush

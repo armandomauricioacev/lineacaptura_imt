@@ -177,12 +177,6 @@
 </head>
 <body>
 
-    {{-- ========================================================== --}}
-    {{-- INICIO DE LA CORRECCIÓN                                    --}}
-    {{-- Se eliminó el div #login-screen y el script de JS.        --}}
-    {{-- El div #admin-panel ahora se muestra por defecto.          --}}
-    {{-- ========================================================== --}}
-
     <div id="admin-panel">
         <header class="responsive-header">
             <div class="header-icon left-icon">
@@ -196,6 +190,16 @@
                 <li><a href="#"><img src="https://img.icons8.com/ios-filled/50/ffffff/dashboard-layout.png" alt="dashboard"/><span>Dashboard</span></a></li>
                 <li><a href="#"><img src="https://img.icons8.com/ios-filled/50/ffffff/document.png" alt="tramites"/><span>Trámites</span></a></li>
                 <li><a href="#"><img src="https://img.icons8.com/ios-filled/50/ffffff/building.png" alt="dependencias"/><span>Dependencias</span></a></li>
+
+                {{-- ========================================================== --}}
+                {{-- INICIO DE LA CORRECCIÓN                                    --}}
+                {{-- Se agregó el enlace a la página de registro de usuarios.   --}}
+                {{-- ========================================================== --}}
+                <li><a href="{{ route('register') }}"><img src="https://img.icons8.com/ios-filled/50/ffffff/add-user-male.png" alt="usuarios"/><span>Usuarios</span></a></li>
+                {{-- ========================================================== --}}
+                {{-- FIN DE LA CORRECCIÓN                                       --}}
+                {{-- ========================================================== --}}
+
                 <hr class="separador-side">
                 
                 {{-- CÓDIGO ACTUALIZADO PARA CERRAR SESIÓN --}}
@@ -235,10 +239,6 @@
             </div>
         </main>
     </div>
-
-    {{-- ========================================================== --}}
-    {{-- FIN DE LA CORRECCIÓN                                       --}}
-    {{-- ========================================================== --}}
 
 </body>
 </html>

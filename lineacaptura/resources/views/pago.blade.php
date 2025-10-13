@@ -105,7 +105,7 @@
   {{-- Breadcrumb, Título y Pasos --}}
   <ol class="breadcrumb" style="margin-top:10px">
     <li><a href="{{ url('/') }}">Inicio</a></li>
-    <li><a href="{{ url('/persona') }}">Instituto Mexicano del Transporte</a></li>
+    <li>Instituto Mexicano del Transporte</li>
   </ol>
   <center><h1 style="margin:10px 0 6px;">Instituto Mexicano del Transporte</h1></center>
   <br>
@@ -185,7 +185,17 @@
   {{-- Acciones --}}
   <div class="row nav-actions" style="margin-top:16px">
     <div class="col-xs-6">
-      <a href="{{ url('/persona') }}" class="btn btn-gob-outline" aria-label="Regresar al paso anterior">Regresar</a>
+      {{-- ========================================================== --}}
+      {{-- INICIO DE LA CORRECCIÓN                                    --}}
+      {{-- ========================================================== --}}
+      <form action="{{ route('regresar') }}" method="POST" style="display: inline;">
+        @csrf
+        <input type="hidden" name="paso_actual" value="pago">
+        <button type="submit" class="btn btn-gob-outline" aria-label="Regresar al paso anterior">Regresar</button>
+      </form>
+      {{-- ========================================================== --}}
+      {{-- FIN DE LA CORRECCIÓN                                     --}}
+      {{-- ========================================================== --}}
     </div>
     <div class="col-xs-6 text-right">
       <form action="{{ route('linea.generar') }}" method="POST" style="display: inline;">
@@ -196,3 +206,22 @@
   </div>
   <br>
 @endsection
+
+{{-- ========================================================== --}}
+{{-- INICIO DE LA CORRECCIÓN                                    --}}
+{{-- ========================================================== --}}
+@push('scripts')
+<script>
+    (function () {
+        // Previene que se pueda volver atrás en el historial del navegador.
+        // Al intentar retroceder, simplemente se recarga la página actual.
+        history.pushState(null, document.title, location.href);
+        window.addEventListener('popstate', function () {
+            history.pushState(null, document.title, location.href);
+        });
+    })();
+</script>
+@endpush
+{{-- ========================================================== --}}
+{{-- FIN DE LA CORRECCIÓN                                     --}}
+{{-- ========================================================== --}}

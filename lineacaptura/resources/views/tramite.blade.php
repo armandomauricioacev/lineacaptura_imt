@@ -15,70 +15,35 @@
     .btn-gob-outline:hover, .btn-gob-outline:focus{ background:var(--gob-rojo) !important; color:#fff !important; border-color:var(--gob-rojo) !important; box-shadow:none !important; text-decoration:none !important; outline: none !important; }
     .btn-quitar { color: #a94442; background: transparent; border: none; font-size: 1.5em; line-height: 1; padding: 0 5px; cursor: pointer; }
     .btn-quitar:hover { color: #7a2b29; }
-    
-    /* ========================================================== */
-    /* INICIO DE LAS CORRECCIONES DE RESPONSIVIDAD                */
-    /* ========================================================== */
-    @media (max-width: 767px) {
-        /* Ocultamos los encabezados originales de la tabla */
-        .tabla-tramites thead {
-            display: none;
-        }
-        /* Ocultamos el pie de tabla original */
-        .tabla-tramites tfoot {
-            display: none;
-        }
-        /* Convertimos cada fila en un bloque separado (como una tarjeta) */
-        .tabla-tramites tr {
-            display: block;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            margin-bottom: 20px;
-            padding: 15px;
-        }
-        /* Convertimos cada celda en un bloque y alineamos el contenido */
-        .tabla-tramites td {
-            display: block;
-            text-align: right;
-            position: relative;
-            padding-left: 50%;
-            border-bottom: 1px solid #eee;
-            padding-top: 10px;
-            padding-bottom: 10px;
-            word-wrap: break-word;
-        }
-        /* La primera celda (Descripción) se trata como un título */
-        .tabla-tramites td:first-child {
-            padding-left: 0;
-            text-align: left;
-            font-weight: bold;
-            font-size: 1.1em;
-            border-bottom: 1px solid #ccc;
-            margin-bottom: 10px;
-        }
-        /* Se añade la etiqueta de texto antes del contenido para las demás celdas */
-        .tabla-tramites td:not(:first-child):not(:last-child)::before {
-            content: attr(data-label);
-            position: absolute;
-            left: 0;
-            font-weight: 600;
-            color: #555;
-            text-align: left;
-        }
-        /* Ocultamos la etiqueta para la descripción */
-        .tabla-tramites td:first-child::before {
-            display: none;
-        }
-        /* Estilo especial para la celda del botón de eliminar */
-        .tabla-tramites td:last-child {
-            border-bottom: none;
-            padding: 10px 0 0;
-            text-align: right;
-        }
-        .tabla-tramites td:last-child::before {
-            display: none;
-        }
 
+    /* ========================================================== */
+    /* INICIO DE LA MODIFICACIÓN DE ESTILOS                       */
+    /* Se añaden los estilos del contenedor del total como en pago.blade.php */
+    /* ========================================================== */
+    .total-container { text-align: center; margin-top: 20px; padding: 20px; border-top: 1px solid #eee; }
+    .total-container .total-label { font-size: 1.5em; color: #333; font-weight: normal; }
+    .total-container .total-amount { font-size: 2em; color: #000; font-weight: normal; display: block; margin-top: 5px; }
+    
+    @media (max-width: 767px) {
+        .tabla-tramites thead { display: none; }
+        .tabla-tramites tr {
+            display: block; border: 1px solid #ddd; border-radius: 4px;
+            margin-bottom: 20px; padding: 15px;
+        }
+        .tabla-tramites td {
+            display: block; text-align: right; position: relative; padding-left: 50%;
+            border-bottom: 1px solid #eee; padding-top: 10px; padding-bottom: 10px; word-wrap: break-word;
+        }
+        .tabla-tramites td:last-child { border-bottom: none; }
+        .tabla-tramites td:first-child {
+            padding-left: 0; text-align: left; font-weight: bold; font-size: 1.1em;
+            border-bottom: 1px solid #ccc; margin-bottom: 10px;
+        }
+        .tabla-tramites td:not(:first-child)::before {
+            content: attr(data-label); position: absolute; left: 0;
+            font-weight: 600; color: #555; text-align: left;
+        }
+        .tabla-tramites td:first-child::before { display: none; }
     }
 
     @media (max-width:575px){
@@ -88,15 +53,12 @@
       .nav-actions .col-xs-6{ width:100%; float:none; }
       .nav-actions .col-xs-6 + .col-xs-6{ margin-top:10px; text-align:center; }
     }
-    /* ========================================================== */
-    /* FIN DE LAS CORRECCIONES                                    */
-    /* ========================================================== */
   </style>
 
   {{-- Breadcrumb --}}
   <ol class="breadcrumb" style="margin-top:10px">
     <li><a href="{{ url('/') }}">Inicio</a></li>
-    <li>{{ $dependencia->nombre }}</li>
+    <li>Instituto Mexicano del Transporte</li>
   </ol>
 
   <div id="alert-placeholder" style="margin-top: 15px;"></div>
@@ -135,7 +97,6 @@
     <div id="tramites-hidden-container"></div>
 
     <h4>Trámites seleccionados:</h4>
-    {{-- SE ELIMINÓ EL DIV "table-responsive" Y SE AÑADIÓ LA CLASE "tabla-tramites" A LA TABLA --}}
     <table class="table tabla-tramites">
       <thead>
         <tr>
@@ -151,24 +112,32 @@
               <td colspan="5" class="text-center" style="padding: 20px; color: #777;">Aún no has agregado trámites.</td>
           </tr>
       </tbody>
-      <tfoot>
-          <tr style="font-weight: bold; font-size: 1.2em;">
-              <td colspan="3" class="text-right">Total a pagar:</td>
-              <td id="total-general" class="text-right">$0.00 MXN</td>
-              <td></td>
-          </tr>
-      </tfoot>
+      {{-- Se elimina el tfoot de aquí --}}
     </table>
-
-    <div class="row nav-actions" style="margin-top:10px">
-      <div class="col-xs-6">
-        <a href="{{ url('/') }}" class="btn btn-gob-outline">Regresar</a>
-      </div>
-      <div class="col-xs-6 text-right">
-        <button type="submit" class="btn btn-gob-outline" id="btnSiguiente">Siguiente</button>
-      </div>
-    </div>
   </form>
+
+  {{-- ========================================================== --}}
+  {{-- INICIO DE LA MODIFICACIÓN                                  --}}
+  {{-- Se añade el nuevo contenedor para el total.                --}}
+  {{-- ========================================================== --}}
+  <div class="total-container">
+    <span class="total-label">Importe total a pagar:</span>
+    <span class="total-amount" id="total-general">$0.00 MXN</span>
+  </div>
+
+  {{-- La navegación ahora está fuera del formulario principal --}}
+  <div class="row nav-actions" style="margin-top:10px">
+    <div class="col-xs-6">
+      <form action="{{ route('regresar') }}" method="POST" style="display: inline;">
+          @csrf
+          <input type="hidden" name="paso_actual" value="tramite">
+          <button type="submit" class="btn btn-gob-outline" aria-label="Regresar al paso anterior">Regresar</button>
+      </form>
+    </div>
+    <div class="col-xs-6 text-right">
+      <button type="submit" class="btn btn-gob-outline" id="btnSiguiente" form="tramiteForm">Siguiente</button>
+    </div>
+  </div>
 
   <p style="margin-top:15px; color:#777; font-size:12px">* Campos obligatorios</p>
 @endsection
@@ -180,9 +149,10 @@ document.addEventListener('DOMContentLoaded', function () {
     const tramiteSelect = document.getElementById('tramiteSelect');
     const tramitesSeleccionadosBody = document.getElementById('tramitesSeleccionadosBody');
     const hiddenContainer = document.getElementById('tramites-hidden-container');
-    const totalGeneralCell = document.getElementById('total-general');
+    const totalGeneralSpan = document.getElementById('total-general'); // <--- CAMBIO AQUÍ
     const alertPlaceholder = document.getElementById('alert-placeholder');
     const emptyRow = document.getElementById('empty-row');
+    const btnSiguiente = document.getElementById('btnSiguiente');
 
     let tramitesSeleccionados = [];
     const MAX_TRAMITES = 10;
@@ -216,7 +186,6 @@ document.addEventListener('DOMContentLoaded', function () {
                 const totalTramite = parseFloat(tramite.cuota) + ivaMonto;
                 totalGeneral += totalTramite;
                 
-                // === SE AÑADIERON LOS ATRIBUTOS data-label A CADA CELDA ===
                 const newRow = `
                     <tr data-id="${tramite.id}">
                         <td data-label="Descripción del concepto">${tramite.descripcion}</td>
@@ -237,7 +206,8 @@ document.addEventListener('DOMContentLoaded', function () {
             });
         }
         
-        totalGeneralCell.textContent = formatCurrency(totalGeneral) + ' MXN';
+        // --- CAMBIO AQUÍ: Se actualiza el nuevo span ---
+        totalGeneralSpan.textContent = formatCurrency(totalGeneral) + ' MXN';
     }
 
     function formatCurrency(value) {
@@ -282,12 +252,19 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     });
 
-    tramiteForm.addEventListener('submit', function (event) {
+    // --- CAMBIO AQUÍ: El listener ahora apunta al botón 'Siguiente' ---
+    btnSiguiente.addEventListener('click', function (event) {
         if (tramitesSeleccionados.length === 0) {
             event.preventDefault();
             showAlert('Debes agregar al menos un trámite para poder continuar.');
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
+    });
+
+    // Script para bloquear las flechas del navegador
+    history.pushState(null, document.title, location.href);
+    window.addEventListener('popstate', function () {
+        history.pushState(null, document.title, location.href);
     });
 });
 </script>
