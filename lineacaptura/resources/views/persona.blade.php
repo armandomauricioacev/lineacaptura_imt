@@ -4,7 +4,7 @@
 
 @section('content')
   <style>
-    /* ... (Tu CSS no necesita cambios) ... */
+    /* ... (Tu CSS no necesita cambios y se mantiene intacto) ... */
     :root{ --gob-rojo:#611232; }
     #pasos .nav-pills{ display:flex; justify-content:center; align-items:stretch; gap:12px; padding-left:0; flex-wrap:nowrap; }
     #pasos .nav-pills>li{ float:none; display:block; }
@@ -53,11 +53,6 @@
   <h3 style="margin-top:0">Información de la persona:</h3>
   <div style="height:4px; width:48px; background:#a57f2c; margin:6px 0 18px;"></div>
 
-  {{-- ========================================================== --}}
-  {{-- INICIO DE LA CORRECCIÓN                                    --}}
-  {{-- Se movió el cierre del formulario para después de los      --}}
-  {{-- campos de entrada, pero ANTES de los botones de navegación.--}}
-  {{-- ========================================================== --}}
   <form id="personaForm" action="{{ route('pago.store') }}" method="POST" role="form" aria-label="Formulario de datos de la persona" novalidate>
     @csrf
     {{-- Tipo de persona --}}
@@ -111,7 +106,11 @@
         </div>
         <div class="col-sm-4">
           <div class="form-group">
-            <label for="apellido_materno">Apellido materno <span style="color:#a00">*</span></label>
+            {{-- ========================================================== --}}
+            {{-- INICIO DE LA CORRECCIÓN                                    --}}
+            {{-- 1. Se eliminó el asterisco de campo obligatorio.          --}}
+            {{-- ========================================================== --}}
+            <label for="apellido_materno">Apellido materno</label>
             <input type="text" id="apellido_materno" name="apellido_materno" class="form-control to-uppercase" placeholder="Ingresa tu segundo apellido">
             <small id="apellido_materno-error" class="error-message"></small>
           </div>
@@ -140,9 +139,6 @@
       </div>
     </div>
   </form>
-  {{-- ========================================================== --}}
-  {{-- FIN DE LA CORRECCIÓN                                     --}}
-  {{-- ========================================================== --}}
 
   {{-- Navegación --}}
   <div class="row nav-actions" style="margin-top:10px">
@@ -154,15 +150,7 @@
       </form>
     </div>
     <div class="col-xs-6 text-right">
-        {{-- ========================================================== --}}
-        {{-- INICIO DE LA CORRECCIÓN                                    --}}
-        {{-- Se añade el atributo 'form' para vincular este botón      --}}
-        {{-- con el formulario de arriba, que ahora está separado.   --}}
-        {{-- ========================================================== --}}
       <button type="submit" class="btn btn-gob-outline" id="btn-continuar" form="personaForm" aria-label="Continuar al formato de pago">Siguiente</button>
-      {{-- ========================================================== --}}
-      {{-- FIN DE LA CORRECCIÓN                                     --}}
-      {{-- ========================================================== --}}
     </div>
   </div>
 
@@ -179,9 +167,10 @@ document.addEventListener('DOMContentLoaded', function () {
     const uppercaseInputs = document.querySelectorAll('.to-uppercase');
     const alertPlaceholder = document.getElementById('alert-placeholder');
     
-    // ... (El resto de tu script de validación se mantiene igual)
     function syncTipo() {
         const r = document.querySelector('input[name="tipo_persona"]:checked');
+        
+        // Limpiamos los required de todos los campos para empezar de cero
         pf.querySelectorAll('input').forEach(input => input.required = false);
         pm.querySelectorAll('input').forEach(input => input.required = false);
         
@@ -189,7 +178,16 @@ document.addEventListener('DOMContentLoaded', function () {
             if (r.value === 'fisica') {
                 pm.style.display = 'none';
                 pf.style.display = 'block';
-                pf.querySelectorAll('input').forEach(input => input.required = true);
+                // ========================================================== --}}
+                // INICIO DE LA CORRECCIÓN                                    --}}
+                // 2. Se especifica qué campos son obligatorios, omitiendo  --}}
+                //    el apellido materno.                                  --}}
+                // ========================================================== --}}
+                pf.querySelector('#curp').required = true;
+                pf.querySelector('#rfc_pf').required = true;
+                pf.querySelector('#nombres').required = true;
+                pf.querySelector('#apellido_paterno').required = true;
+                // 'apellido_materno' ya no es requerido
             } else {
                 pf.style.display = 'none';
                 pm.style.display = 'block';
@@ -235,11 +233,6 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
     
-    // ==========================================================
-    // INICIO DE LA CORRECCIÓN                                    
-    // Se cambia el listener para que apunte al botón 'Siguiente'
-    // en lugar de al formulario directamente.
-    // ==========================================================
     document.getElementById('btn-continuar').addEventListener('click', function(event) {
         event.preventDefault(); 
         
@@ -271,6 +264,11 @@ document.addEventListener('DOMContentLoaded', function () {
 
         } else {
             const visibleSection = (tipoPersonaSeleccionado.value === 'fisica') ? pf : pm;
+            // ========================================================== --}}
+            // INICIO DE LA CORRECCIÓN                                    --}}
+            // 3. La validación ahora solo busca los campos que tengan   --}}
+            //    explícitamente el atributo 'required'.                  --}}
+            // ========================================================== --}}
             const requiredInputs = visibleSection.querySelectorAll('input[required]');
             for (const input of requiredInputs) {
                 let hasError = false;

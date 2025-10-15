@@ -6,10 +6,17 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>Panel de Administración - IMT</title>
     
+    <!-- Fuente Montserrat -->
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         html { scroll-behavior: smooth; }
-        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif; background-color: #f8f9fc; color: #5a5c69; }
+        body { 
+            font-family: 'Montserrat', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif; 
+            background-color: #f8f9fc; 
+            color: #5a5c69; 
+        }
         a { text-decoration: none; cursor: pointer; }
         .responsive-header { width: 100%; height: 60px; display: flex; align-items: center; justify-content: space-between; padding: 0 20px; background-color: #03658C; position: fixed; z-index: 1000; top: 0; left: 0; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
         .header-icon { height: 40px; }
@@ -29,7 +36,11 @@
         .table-container { overflow-x: auto; }
         .data-table { width: 100%; border-collapse: collapse; font-size: 0.85em; }
         .data-table th, .data-table td { padding: 10px 12px; border: 1px solid #e3e6f0; text-align: left; white-space: nowrap; }
-        .data-table thead th { background-color: #f8f9fc; font-weight: 600; }
+        .data-table thead th { 
+            background-color: #03658C; 
+            font-weight: 600; 
+            color: #ffffff;
+        }
         .data-table tbody tr:hover { background-color: #e9ecef; }
         .data-table .wrap-text { white-space: normal; min-width: 250px; }
         
@@ -51,10 +62,11 @@
         }
         .search-box input {
             width: 100%;
-            padding: 10px 40px 10px 15px;
+            padding: 10px 40px 10px 40px;
             border: 1px solid #d1d3e2;
             border-radius: 6px;
             font-size: 0.9em;
+            font-family: 'Montserrat', sans-serif;
         }
         .search-box input:focus {
             outline: none;
@@ -63,15 +75,16 @@
         }
         .search-icon {
             position: absolute;
-            right: 12px;
+            left: 12px;
             top: 50%;
             transform: translateY(-50%);
-            color: #858796;
+            width: 20px;
+            height: 20px;
             pointer-events: none;
         }
         .clear-search {
             position: absolute;
-            right: 35px;
+            right: 12px;
             top: 50%;
             transform: translateY(-50%);
             background: none;
@@ -98,6 +111,7 @@
             border-radius: 6px;
             font-size: 0.9em;
             background: white;
+            font-family: 'Montserrat', sans-serif;
         }
         .results-count {
             font-size: 0.85em;
@@ -119,7 +133,7 @@
         }
         
         /* Botones de acción */
-        .btn { padding: 6px 12px; border: none; border-radius: 4px; cursor: pointer; font-size: 0.85em; transition: all 0.2s; }
+        .btn { padding: 6px 12px; border: none; border-radius: 4px; cursor: pointer; font-size: 0.85em; transition: all 0.2s; font-family: 'Montserrat', sans-serif; }
         .btn-primary { background-color: #03658C; color: white; }
         .btn-primary:hover { background-color: #025070; }
         .btn-success { background-color: #28a745; color: white; }
@@ -145,7 +159,7 @@
         /* Formularios */
         .form-group { margin-bottom: 15px; }
         .form-group label { display: block; margin-bottom: 5px; font-weight: 500; color: #3a3b45; }
-        .form-control { width: 100%; padding: 8px 12px; border: 1px solid #d1d3e2; border-radius: 4px; font-size: 0.9em; }
+        .form-control { width: 100%; padding: 8px 12px; border: 1px solid #d1d3e2; border-radius: 4px; font-size: 0.9em; font-family: 'Montserrat', sans-serif; }
         .form-control:focus { outline: none; border-color: #03658C; }
         .form-check { display: flex; align-items: center; gap: 8px; }
         .form-check input[type="checkbox"] { width: 18px; height: 18px; cursor: pointer; }
@@ -162,7 +176,7 @@
             <div class="header-icon">
                 <img src="{{ asset('img/imtblanco.png') }}" alt="Logo IMT">
             </div>
-            <h1 class="header-title">Panel de Administración</h1>
+            <h1 class="header-title">Panel de administración</h1>
         </header>
 
         <aside class="sidebar">
@@ -170,12 +184,12 @@
                 <li><a href="#" data-target="inicio-section" class="nav-link active"><img src="https://img.icons8.com/ios-glyphs/30/ffffff/home.png" alt="inicio"/><span>Inicio</span></a></li>
                 <li><a href="#" data-target="dependencias-section" class="nav-link"><img src="https://img.icons8.com/ios-filled/50/ffffff/building.png" alt="dependencias"/><span>Dependencias</span></a></li>
                 <li><a href="#" data-target="tramites-section" class="nav-link"><img src="https://img.icons8.com/ios-filled/50/ffffff/document.png" alt="tramites"/><span>Trámites</span></a></li>
-                <li><a href="#" data-target="lineas-captura-section" class="nav-link"><img src="https://img.icons8.com/ios-filled/50/ffffff/receipt.png" alt="lineas-captura"/><span>Líneas de Captura</span></a></li>
+                <li><a href="#" data-target="lineas-captura-section" class="nav-link"><img src="https://img.icons8.com/ios-filled/50/ffffff/receipt.png" alt="lineas-captura"/><span>Líneas de captura</span></a></li>
                 <li><a href="#" data-target="users-section" class="nav-link"><img src="https://img.icons8.com/ios-filled/50/ffffff/user.png" alt="usuarios"/><span>Usuarios</span></a></li>
                 
                 <hr class="separador-side">
 
-                <li><a href="{{ route('register') }}"><img src="https://img.icons8.com/ios-filled/50/ffffff/add-user-male.png" alt="nuevo-administrador"/><span>Nuevo Administrador</span></a></li>
+                <li><a href="{{ route('register') }}"><img src="https://img.icons8.com/ios-filled/50/ffffff/add-user-male.png" alt="nuevo-administrador"/><span>Nuevo administrador</span></a></li>
                 
                 <li>
                     <form method="POST" action="{{ route('logout') }}">
@@ -210,7 +224,7 @@
                 <p>Este es el centro de control para el sistema de líneas de captura del IMT. Desde aquí puedes gestionar toda la información del sistema.</p>
                 
                 <div style="margin-top: 30px; padding: 20px; background-color: #f8f9fc; border-radius: 8px;">
-                    <h3 style="margin-bottom: 15px; color: #03658C;">Resumen del Sistema</h3>
+                    <h3 style="margin-bottom: 15px; color: #03658C;">Resumen del sistema</h3>
                     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
                         <div style="background: white; padding: 15px; border-radius: 6px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
                             <p style="color: #6c757d; margin-bottom: 5px;">Dependencias</p>
@@ -221,7 +235,7 @@
                             <p style="font-size: 2em; font-weight: bold; color: #28a745;">{{ $tramites->count() }}</p>
                         </div>
                         <div style="background: white; padding: 15px; border-radius: 6px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
-                            <p style="color: #6c757d; margin-bottom: 5px;">Líneas de Captura</p>
+                            <p style="color: #6c757d; margin-bottom: 5px;">Líneas de captura</p>
                             <p style="font-size: 2em; font-weight: bold; color: #ffc107;">{{ $lineasCapturadas->count() }}</p>
                         </div>
                         <div style="background: white; padding: 15px; border-radius: 6px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
@@ -236,19 +250,8 @@
             <section id="dependencias-section" class="content-card data-section">
                 <div class="title-content">
                     <h3>Dependencias</h3>
-                    <button class="btn btn-primary" onclick="openCreateModal('dependencia')">+ Nueva Dependencia</button>
                 </div>
                 <hr>
-                
-                <!-- Búsqueda y Filtros -->
-                <div class="search-filter-container">
-                    <div class="search-box">
-                        <input type="text" id="searchDependencias" placeholder="🔍 Buscar en dependencias (nombre, clave, unidad administrativa...)">
-                        <button class="clear-search" id="clearSearchDep" onclick="clearSearch('dependencias')">&times;</button>
-                        <span class="search-icon">🔍</span>
-                    </div>
-                    <span class="results-count" id="resultsDep">Mostrando {{ $dependencias->count() }} de {{ $dependencias->count() }}</span>
-                </div>
                 
                 <div class="table-container">
                     <table class="data-table">
@@ -290,27 +293,22 @@
             <section id="tramites-section" class="content-card data-section">
                 <div class="title-content">
                     <h3>Trámites</h3>
-                    <button class="btn btn-primary" onclick="openCreateModal('tramite')">+ Nuevo Trámite</button>
+                    <button class="btn btn-primary" onclick="openCreateModal('tramite')">+ Nuevo trámite</button>
                 </div>
                 <hr>
                 
                 <!-- Búsqueda y Filtros -->
                 <div class="search-filter-container">
                     <div class="search-box">
-                        <input type="text" id="searchTramites" placeholder="🔍 Buscar en trámites (clave, descripción, cuota...)">
+                        <img src="https://img.icons8.com/ios-filled/50/858796/search.png" class="search-icon" alt="buscar">
+                        <input type="text" id="searchTramites" placeholder="Buscar en trámites (clave, descripción, cuota...)">
                         <button class="clear-search" id="clearSearchTra" onclick="clearSearch('tramites')">&times;</button>
-                        <span class="search-icon">🔍</span>
                     </div>
                     <div class="filter-group">
                         <select class="filter-select" id="filterIVA" onchange="filterTramites()">
                             <option value="">Todos (IVA)</option>
                             <option value="si">Con IVA</option>
                             <option value="no">Sin IVA</option>
-                        </select>
-                        <select class="filter-select" id="filterObligatorio" onchange="filterTramites()">
-                            <option value="">Todos (Obligatorio)</option>
-                            <option value="S">Sí</option>
-                            <option value="N">No</option>
                         </select>
                     </div>
                     <span class="results-count" id="resultsTra">Mostrando {{ $tramites->count() }} de {{ $tramites->count() }}</span>
@@ -352,9 +350,8 @@
                         </thead>
                         <tbody id="tableTramites">
                             @forelse($tramites as $item)
-                            <tr data-search="{{ strtolower($item->id . ' ' . $item->clave_dependencia_siglas . ' ' . $item->clave_tramite . ' ' . $item->variante . ' ' . $item->descripcion . ' ' . $item->fundamento_legal . ' ' . $item->cuota . ' ' . $item->clave_contable) }}"
-                                data-iva="{{ $item->iva ? 'si' : 'no' }}"
-                                data-obligatorio="{{ $item->obligatorio ?? '' }}">
+                            <tr data-search="{{ strtolower($item->id . ' ' . $item->clave_dependencia_siglas . ' ' . $item->clave_tramite . ' ' . $item->variante . ' ' . $item->descripcion . ' ' . $item->fundamento_legal . ' ' . $item->cuota . ' ' . $item->clave_contable . ' ' . $item->monto_iva . ' ' . ($item->iva ? 'si con iva' : 'no sin iva')) }}"
+                                data-iva="{{ $item->iva ? 'si' : 'no' }}">
                                 <td>{{ $item->id }}</td>
                                 <td>{{ $item->clave_dependencia_siglas }}</td>
                                 <td>{{ $item->clave_tramite }}</td>
@@ -402,8 +399,19 @@
 
             <!-- LÍNEAS DE CAPTURA -->
             <section id="lineas-captura-section" class="content-card data-section">
-                <h3 class="title-content">Líneas de Captura Generadas</h3>
+                <h3 class="title-content">Líneas de captura generadas</h3>
                 <hr>
+                
+                <!-- Búsqueda Líneas de Captura -->
+                <div class="search-filter-container">
+                    <div class="search-box">
+                        <img src="https://img.icons8.com/ios-filled/50/858796/search.png" class="search-icon" alt="buscar">
+                        <input type="text" id="searchLineas" placeholder="Buscar en líneas de captura (CURP, RFC, nombre, estado...)">
+                        <button class="clear-search" id="clearSearchLineas" onclick="clearSearch('lineas')">&times;</button>
+                    </div>
+                    <span class="results-count" id="resultsLineas">Mostrando {{ $lineasCapturadas->count() }} de {{ $lineasCapturadas->count() }}</span>
+                </div>
+                
                 <div class="table-container">
                     <table class="data-table">
                         <thead>
@@ -429,9 +437,9 @@
                                 <th>Actualizado</th>
                             </tr>
                         </thead>
-                        <tbody>
+                        <tbody id="tableLineas">
                             @forelse($lineasCapturadas as $item)
-                            <tr>
+                            <tr data-search="{{ strtolower($item->id . ' ' . $item->tipo_persona . ' ' . ($item->curp ?? '') . ' ' . $item->rfc . ' ' . ($item->razon_social ?? '') . ' ' . ($item->nombres ?? '') . ' ' . ($item->apellido_paterno ?? '') . ' ' . ($item->apellido_materno ?? '') . ' ' . $item->dependencia_id . ' ' . ($item->tramite_id ?? '') . ' ' . ($item->solicitud ?? '') . ' ' . $item->importe_cuota . ' ' . $item->importe_iva . ' ' . $item->importe_total . ' ' . ($item->estado_pago ?? 'pendiente')) }}">
                                 <td>{{ $item->id }}</td>
                                 <td>{{ $item->tipo_persona }}</td>
                                 <td>{{ $item->curp ?? 'N/A' }}</td>
@@ -457,13 +465,27 @@
                             @endforelse
                         </tbody>
                     </table>
+                    <div id="noResultsLineas" class="no-results" style="display: none;">
+                        <p>❌ No se encontraron resultados para tu búsqueda</p>
+                    </div>
                 </div>
             </section>
 
             <!-- USUARIOS -->
             <section id="users-section" class="content-card data-section">
-                <h3 class="title-content">Usuarios del Sistema</h3>
+                <h3 class="title-content">Usuarios del sistema</h3>
                 <hr>
+                
+                <!-- Búsqueda Usuarios -->
+                <div class="search-filter-container">
+                    <div class="search-box">
+                        <img src="https://img.icons8.com/ios-filled/50/858796/search.png" class="search-icon" alt="buscar">
+                        <input type="text" id="searchUsers" placeholder="Buscar usuarios (ID, nombre, email...)">
+                        <button class="clear-search" id="clearSearchUsers" onclick="clearSearch('users')">&times;</button>
+                    </div>
+                    <span class="results-count" id="resultsUsers">Mostrando {{ $users->count() }} de {{ $users->count() }}</span>
+                </div>
+                
                 <div class="table-container">
                     <table class="data-table">
                         <thead>
@@ -475,9 +497,9 @@
                                 <th>Acciones</th>
                             </tr>
                         </thead>
-                        <tbody>
+                        <tbody id="tableUsers">
                             @forelse($users as $user)
-                            <tr>
+                            <tr data-search="{{ strtolower($user->id . ' ' . $user->name . ' ' . $user->email . ' ' . ($user->created_at ? $user->created_at->format('d/m/Y') : '')) }}">
                                 <td>{{ $user->id }}</td>
                                 <td>{{ $user->name }}</td>
                                 <td>{{ $user->email }}</td>
@@ -494,6 +516,9 @@
                             @endforelse
                         </tbody>
                     </table>
+                    <div id="noResultsUsers" class="no-results" style="display: none;">
+                        <p>❌ No se encontraron resultados para tu búsqueda</p>
+                    </div>
                 </div>
             </section>
         </main>
@@ -728,7 +753,7 @@
                         <input type="email" class="form-control" id="user_email" name="email" required>
                     </div>
                     <div class="form-group">
-                        <label for="user_password">Nueva Contraseña (dejar en blanco para no cambiar)</label>
+                        <label for="user_password">Nueva contraseña (dejar en blanco para no cambiar)</label>
                         <input type="password" class="form-control" id="user_password" name="password" minlength="8">
                     </div>
                     <div class="form-group">
@@ -818,6 +843,24 @@
                     toggleClearButton('clearSearchTra', this.value);
                 });
             }
+
+            // Búsqueda en Líneas de Captura
+            const searchLineas = document.getElementById('searchLineas');
+            if (searchLineas) {
+                searchLineas.addEventListener('input', function() {
+                    filterTable('lineas', this.value);
+                    toggleClearButton('clearSearchLineas', this.value);
+                });
+            }
+
+            // Búsqueda en Usuarios
+            const searchUsers = document.getElementById('searchUsers');
+            if (searchUsers) {
+                searchUsers.addEventListener('input', function() {
+                    filterTable('users', this.value);
+                    toggleClearButton('clearSearchUsers', this.value);
+                });
+            }
         }
 
         function toggleClearButton(buttonId, value) {
@@ -835,23 +878,44 @@
             } else if (type === 'tramites') {
                 document.getElementById('searchTramites').value = '';
                 document.getElementById('filterIVA').value = '';
-                document.getElementById('filterObligatorio').value = '';
                 filterTramites();
                 document.getElementById('clearSearchTra').style.display = 'none';
+            } else if (type === 'lineas') {
+                document.getElementById('searchLineas').value = '';
+                filterTable('lineas', '');
+                document.getElementById('clearSearchLineas').style.display = 'none';
+            } else if (type === 'users') {
+                document.getElementById('searchUsers').value = '';
+                filterTable('users', '');
+                document.getElementById('clearSearchUsers').style.display = 'none';
             }
         }
 
         function filterTable(type, searchTerm) {
-            const tableId = type === 'dependencias' ? 'tableDependencias' : 'tableTramites';
-            const resultsId = type === 'dependencias' ? 'resultsDep' : 'resultsTra';
-            const noResultsId = type === 'dependencias' ? 'noResultsDep' : 'noResultsTra';
+            let tableId, resultsId, noResultsId, totalCount;
+            
+            if (type === 'dependencias') {
+                tableId = 'tableDependencias';
+                resultsId = 'resultsDep';
+                noResultsId = 'noResultsDep';
+                totalCount = {{ $dependencias->count() }};
+            } else if (type === 'lineas') {
+                tableId = 'tableLineas';
+                resultsId = 'resultsLineas';
+                noResultsId = 'noResultsLineas';
+                totalCount = {{ $lineasCapturadas->count() }};
+            } else if (type === 'users') {
+                tableId = 'tableUsers';
+                resultsId = 'resultsUsers';
+                noResultsId = 'noResultsUsers';
+                totalCount = {{ $users->count() }};
+            }
             
             const table = document.getElementById(tableId);
             const rows = table.getElementsByTagName('tr');
             const searchLower = searchTerm.toLowerCase().trim();
             
             let visibleCount = 0;
-            const totalCount = rows.length;
 
             for (let i = 0; i < rows.length; i++) {
                 const searchData = rows[i].getAttribute('data-search');
@@ -883,13 +947,12 @@
         function filterTramites() {
             const searchTerm = document.getElementById('searchTramites').value.toLowerCase().trim();
             const filterIVA = document.getElementById('filterIVA').value;
-            const filterObligatorio = document.getElementById('filterObligatorio').value;
             
             const table = document.getElementById('tableTramites');
             const rows = table.getElementsByTagName('tr');
             
             let visibleCount = 0;
-            const totalCount = rows.length;
+            const totalCount = {{ $tramites->count() }};
 
             for (let i = 0; i < rows.length; i++) {
                 const row = rows[i];
@@ -907,14 +970,6 @@
                     if (filterIVA !== '') {
                         const rowIVA = row.getAttribute('data-iva');
                         if (rowIVA !== filterIVA) {
-                            showRow = false;
-                        }
-                    }
-                    
-                    // Filtro de Obligatorio
-                    if (filterObligatorio !== '') {
-                        const rowObligatorio = row.getAttribute('data-obligatorio');
-                        if (rowObligatorio !== filterObligatorio) {
                             showRow = false;
                         }
                     }

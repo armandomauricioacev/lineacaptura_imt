@@ -16,10 +16,7 @@
     .btn-quitar { color: #a94442; background: transparent; border: none; font-size: 1.5em; line-height: 1; padding: 0 5px; cursor: pointer; }
     .btn-quitar:hover { color: #7a2b29; }
 
-    /* ========================================================== */
-    /* INICIO DE LA MODIFICACIÓN DE ESTILOS                       */
-    /* Se añaden los estilos del contenedor del total como en pago.blade.php */
-    /* ========================================================== */
+    /* Estilos del contenedor del total */
     .total-container { text-align: center; margin-top: 20px; padding: 20px; border-top: 1px solid #eee; }
     .total-container .total-label { font-size: 1.5em; color: #333; font-weight: normal; }
     .total-container .total-amount { font-size: 2em; color: #000; font-weight: normal; display: block; margin-top: 5px; }
@@ -112,20 +109,16 @@
               <td colspan="5" class="text-center" style="padding: 20px; color: #777;">Aún no has agregado trámites.</td>
           </tr>
       </tbody>
-      {{-- Se elimina el tfoot de aquí --}}
     </table>
   </form>
 
-  {{-- ========================================================== --}}
-  {{-- INICIO DE LA MODIFICACIÓN                                  --}}
-  {{-- Se añade el nuevo contenedor para el total.                --}}
-  {{-- ========================================================== --}}
+  {{-- Contenedor para el total --}}
   <div class="total-container">
     <span class="total-label">Importe total a pagar:</span>
     <span class="total-amount" id="total-general">$0.00 MXN</span>
   </div>
 
-  {{-- La navegación ahora está fuera del formulario principal --}}
+  {{-- Navegación --}}
   <div class="row nav-actions" style="margin-top:10px">
     <div class="col-xs-6">
       <form action="{{ route('regresar') }}" method="POST" style="display: inline;">
@@ -149,7 +142,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const tramiteSelect = document.getElementById('tramiteSelect');
     const tramitesSeleccionadosBody = document.getElementById('tramitesSeleccionadosBody');
     const hiddenContainer = document.getElementById('tramites-hidden-container');
-    const totalGeneralSpan = document.getElementById('total-general'); // <--- CAMBIO AQUÍ
+    const totalGeneralSpan = document.getElementById('total-general');
     const alertPlaceholder = document.getElementById('alert-placeholder');
     const emptyRow = document.getElementById('empty-row');
     const btnSiguiente = document.getElementById('btnSiguiente');
@@ -176,7 +169,7 @@ document.addEventListener('DOMContentLoaded', function () {
     function actualizarVista() {
         tramitesSeleccionadosBody.innerHTML = '';
         hiddenContainer.innerHTML = '';
-        let totalGeneral = 0;
+        let totalGeneralSinRedondear = 0;
 
         if (tramitesSeleccionados.length === 0) {
             tramitesSeleccionadosBody.appendChild(emptyRow);
@@ -184,7 +177,7 @@ document.addEventListener('DOMContentLoaded', function () {
             tramitesSeleccionados.forEach((tramite, index) => {
                 const ivaMonto = tramite.iva == '1' ? parseFloat(tramite.cuota) * 0.16 : 0;
                 const totalTramite = parseFloat(tramite.cuota) + ivaMonto;
-                totalGeneral += totalTramite;
+                totalGeneralSinRedondear += totalTramite;
                 
                 const newRow = `
                     <tr data-id="${tramite.id}">
@@ -206,12 +199,21 @@ document.addEventListener('DOMContentLoaded', function () {
             });
         }
         
-        // --- CAMBIO AQUÍ: Se actualiza el nuevo span ---
-        totalGeneralSpan.textContent = formatCurrency(totalGeneral) + ' MXN';
+        // ========================================================== //
+        // INICIO DE LA CORRECCIÓN                                    //
+        // Se aplica Math.round() al total general antes de mostrarlo.//
+        // ========================================================== //
+        const totalRedondeado = Math.round(totalGeneralSinRedondear);
+        totalGeneralSpan.textContent = formatCurrency(totalRedondeado) + ' MXN';
     }
 
     function formatCurrency(value) {
-        return new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'MXN' }).format(value);
+        // Se parsea a float para asegurar que es un número antes de formatear
+        const numberValue = parseFloat(value);
+        if (isNaN(numberValue)) {
+            return '$0.00';
+        }
+        return new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'MXN' }).format(numberValue);
     }
 
     tramiteSelect.addEventListener('change', function() {
@@ -252,7 +254,6 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     });
 
-    // --- CAMBIO AQUÍ: El listener ahora apunta al botón 'Siguiente' ---
     btnSiguiente.addEventListener('click', function (event) {
         if (tramitesSeleccionados.length === 0) {
             event.preventDefault();

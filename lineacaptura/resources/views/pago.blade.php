@@ -24,10 +24,6 @@
     .total-container .total-amount { font-size: 2em; color: #000; font-weight: normal; display: block; margin-top: 5px; }
     .table > thead > tr > th { font-weight: 600; color: #555; }
 
-    /* ========================================================== */
-    /* INICIO DE LAS CORRECCIONES DE RESPONSIVIDAD                */
-    /* ========================================================== */
-
     /* Apila las dos cajas principales en pantallas medianas */
     @media (max-width: 991px) {
         .equal-panels > [class*="col-"] {
@@ -42,51 +38,26 @@
         .resumen.dl-horizontal dd { margin-left: 0; margin-bottom: 15px; }
         
         /* === ESTILOS MEJORADOS PARA LA TABLA RESPONSIVA === */
-        .tabla-tramites thead {
-            display: none;
-        }
+        .tabla-tramites thead { display: none; }
         .tabla-tramites tr {
-            display: block;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            margin-bottom: 20px;
-            padding: 15px;
+            display: block; border: 1px solid #ddd; border-radius: 4px;
+            margin-bottom: 20px; padding: 15px;
         }
         .tabla-tramites td {
-            display: block;
-            text-align: right;
-            position: relative;
-            padding-left: 50%;
-            border-bottom: 1px solid #eee;
-            padding-top: 10px;
-            padding-bottom: 10px;
-            word-wrap: break-word;
+            display: block; text-align: right; position: relative;
+            padding-left: 50%; border-bottom: 1px solid #eee;
+            padding-top: 10px; padding-bottom: 10px; word-wrap: break-word;
         }
-        .tabla-tramites td:last-child {
-            border-bottom: none;
-        }
-        /* La primera celda (Descripción) se trata como un título */
+        .tabla-tramites td:last-child { border-bottom: none; }
         .tabla-tramites td:first-child {
-            padding-left: 0;
-            text-align: left;
-            font-weight: bold;
-            font-size: 1.1em;
-            border-bottom: 1px solid #ccc;
-            margin-bottom: 10px;
+            padding-left: 0; text-align: left; font-weight: bold; font-size: 1.1em;
+            border-bottom: 1px solid #ccc; margin-bottom: 10px;
         }
-        /* Se añade la etiqueta de texto antes del contenido para las demás celdas */
         .tabla-tramites td:not(:first-child)::before {
-            content: attr(data-label);
-            position: absolute;
-            left: 0;
-            font-weight: 600;
-            color: #555;
-            text-align: left;
+            content: attr(data-label); position: absolute; left: 0;
+            font-weight: 600; color: #555; text-align: left;
         }
-        /* Ocultamos la etiqueta para la descripción, ya que es el título */
-        .tabla-tramites td:first-child::before {
-            display: none;
-        }
+        .tabla-tramites td:first-child::before { display: none; }
     }
 
     /* Ajustes para los pasos y botones en móviles */
@@ -97,9 +68,6 @@
       .nav-actions .col-xs-6{ width:100%; float:none; }
       .nav-actions .col-xs-6 + .col-xs-6{ margin-top:10px; text-align:center; }
     }
-    /* ========================================================== */
-    /* FIN DE LAS CORRECCIONES                                    */
-    /* ========================================================== */
   </style>
   
   {{-- Breadcrumb, Título y Pasos --}}
@@ -145,7 +113,6 @@
         <div class="caja">
             <center><h4>Trámites seleccionados</h4></center>
             <hr>
-            {{-- SE ELIMINÓ EL DIV "table-responsive" QUE CAUSABA EL SCROLL --}}
             <table class="table tabla-tramites">
                 <thead>
                     <tr>
@@ -156,12 +123,12 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @php $totalGeneral = 0; @endphp
+                    @php $totalGeneralSinRedondear = 0; @endphp
                     @foreach($tramites as $tramite)
                         @php
                             $montoIva = $tramite->iva ? round($tramite->cuota * 0.16, 2) : 0;
                             $totalTramite = $tramite->cuota + $montoIva;
-                            $totalGeneral += $totalTramite;
+                            $totalGeneralSinRedondear += $totalTramite;
                         @endphp
                         <tr>
                             <td data-label="Descripción">{{ $tramite->descripcion }}</td>
@@ -179,23 +146,22 @@
   {{-- Contenedor para el total general --}}
   <div class="total-container">
     <span class="total-label">Importe total a pagar:</span>
-    <span class="total-amount">${{ number_format($totalGeneral, 2) }} MXN</span>
+    {{-- ========================================================== --}}
+    {{-- INICIO DE LA CORRECCIÓN                                    --}}
+    {{-- Se redondea el total general antes de mostrarlo.           --}}
+    {{-- ========================================================== --}}
+    @php $totalRedondeado = round($totalGeneralSinRedondear); @endphp
+    <span class="total-amount">${{ number_format($totalRedondeado, 2) }} MXN</span>
   </div>
 
   {{-- Acciones --}}
   <div class="row nav-actions" style="margin-top:16px">
     <div class="col-xs-6">
-      {{-- ========================================================== --}}
-      {{-- INICIO DE LA CORRECCIÓN                                    --}}
-      {{-- ========================================================== --}}
       <form action="{{ route('regresar') }}" method="POST" style="display: inline;">
         @csrf
         <input type="hidden" name="paso_actual" value="pago">
         <button type="submit" class="btn btn-gob-outline" aria-label="Regresar al paso anterior">Regresar</button>
       </form>
-      {{-- ========================================================== --}}
-      {{-- FIN DE LA CORRECCIÓN                                     --}}
-      {{-- ========================================================== --}}
     </div>
     <div class="col-xs-6 text-right">
       <form action="{{ route('linea.generar') }}" method="POST" style="display: inline;">
@@ -207,14 +173,10 @@
   <br>
 @endsection
 
-{{-- ========================================================== --}}
-{{-- INICIO DE LA CORRECCIÓN                                    --}}
-{{-- ========================================================== --}}
 @push('scripts')
 <script>
     (function () {
         // Previene que se pueda volver atrás en el historial del navegador.
-        // Al intentar retroceder, simplemente se recarga la página actual.
         history.pushState(null, document.title, location.href);
         window.addEventListener('popstate', function () {
             history.pushState(null, document.title, location.href);
@@ -222,6 +184,3 @@
     })();
 </script>
 @endpush
-{{-- ========================================================== --}}
-{{-- FIN DE LA CORRECCIÓN                                     --}}
-{{-- ========================================================== --}}
