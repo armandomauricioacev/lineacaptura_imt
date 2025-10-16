@@ -22,6 +22,11 @@
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
 
   <style>
+    /* 🎨 VARIABLES DE COLOR PARA FÁCIL ACCESO */
+    :root {
+        --color-dorado-hover: #EABE3F; /* Tono dorado para hover/active */
+    }
+  
     /* Solo tipografía, sin alterar colores del framework */
     body, h1, h2, h3, h4, h5, h6 {
       font-family: "Montserrat", "Open Sans", Arial, sans-serif;
@@ -49,6 +54,31 @@
       outline: none !important;
     }
 
+    /* Eliminar subrayado en TODOS los estados de los enlaces del header */
+    header.main-header a,
+    .navbar a,
+    .navbar-nav .nav-link,
+    .navbar-nav .btn,
+    header a,
+    header button {
+      text-decoration: none !important;
+    }
+
+    header.main-header a:hover,
+    header.main-header a:active,
+    header.main-header a:focus,
+    header.main-header a:visited,
+    .navbar a:hover,
+    .navbar a:active,
+    .navbar a:focus,
+    .navbar a:visited,
+    .navbar-nav .nav-link:hover,
+    .navbar-nav .nav-link:active,
+    .navbar-nav .nav-link:focus,
+    .navbar-nav .nav-link:visited {
+      text-decoration: none !important;
+    }
+
     /* Eliminar estilos de botones específicos del framework */
     .btn-link:hover,
     .btn-link:focus,
@@ -67,22 +97,123 @@
       box-shadow: none !important;
     }
 
+    /* === 🖥️ ESTILOS PARA VISTA DE ESCRITORIO (PC) === */
+    @media (min-width: 992px) {
+        /* Aplica el color dorado al pasar el cursor sobre los elementos del menú */
+        .navbar-nav > .nav-item:hover > .nav-link,
+        .navbar-nav > .nav-item:hover > .btn {
+            color: var(--color-dorado-hover) !important;
+            transition: color 0.2s ease-in-out;
+        }
+
+        /* Eliminar subrayado al hacer clic en los elementos del menú */
+        .navbar-nav > .nav-item > .nav-link:active,
+        .navbar-nav > .nav-item > .btn:active,
+        .navbar-nav > .nav-item > .nav-link:focus,
+        .navbar-nav > .nav-item > .btn:focus {
+            color: var(--color-dorado-hover) !important;
+            text-decoration: none !important;
+        }
+    }
+
+    /* === 📱 ESTILOS PARA VISTA MÓVIL === */
     @media (max-width: 991px) {
       .navbar-toggler {
         align-self: flex-start !important;
         margin-top: -4px !important;
       }
       
-      /* SVG inline con color blanco */
-      .navbar-toggler .navbar-toggler-icon,
-      button.navbar-toggler .navbar-toggler-icon,
-      span.navbar-toggler-icon {
+      /* Icono por defecto - 3 líneas horizontales */
+      .navbar-toggler .navbar-toggler-icon {
         background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='white' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e") !important;
+        transition: transform 0.3s ease-in-out, background-image 0.3s ease-in-out !important;
       }
+
+      /* Cuando el menú está abierto (sin clase collapsed) - X con rotación */
+      .navbar-toggler[aria-expanded="true"] .navbar-toggler-icon {
+        transform: rotate(180deg) !important;
+        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='white' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M6 6L24 24M6 24L24 6'/%3e%3c/svg%3e") !important;
+      }
+
+      /* 1. Forzar color blanco inicial para todos los elementos del menú */
+      .navbar-nav .nav-link,
+      .navbar-nav .btn {
+          color: #ffffff !important;
+      }
+
+      /* 2. Aplicar color dorado solo al presionar (tap) */
+      .navbar-nav .nav-link:active,
+      .navbar-nav .btn:active {
+          color: var(--color-dorado-hover) !important;
+      }
+    }
+
+    /* === 🦶 ESTILOS PARA FOOTER === */
+    
+    /* Quitar cursor pointer de Enlaces y ¿Qué es gob.mx? SOLO EN PC */
+    @media (min-width: 992px) {
+      footer .accordion label,
+      footer .accordion label h5,
+      footer .accordion label h3,
+      footer .accordion-toggle + label,
+      footer label[for^="toggle"],
+      footer .sitemap-list .sitemap-item-title,
+      footer .sitemap-list h3,
+      footer h3.sitemap-item-title,
+      footer .sitemap-item-title,
+      footer .sitemap h3,
+      footer h3 {
+        cursor: default !important;
+      }
+
+      /* Deshabilitar clicks en los labels de acordeón SOLO EN PC */
+      footer .accordion label {
+        pointer-events: none !important;
+      }
+    }
+
+    /* EN MÓVIL: Mantener funcionalidad normal del acordeón */
+    @media (max-width: 991px) {
+      footer .accordion label {
+        cursor: pointer !important;
+        pointer-events: auto !important;
+      }
+    }
+
+    /* Permitir clicks en los enlaces en TODAS las vistas */
+    footer .accordion a,
+    footer a {
+      pointer-events: auto !important;
+      cursor: pointer !important;
+    }
+
+    /* Color dorado en hover para los enlaces del footer - ESCRITORIO */
+    @media (min-width: 992px) {
+      footer a:hover,
+      footer .sitemap-list a:hover,
+      footer .sitemap-links a:hover {
+        color: var(--color-dorado-hover) !important;
+        transition: color 0.2s ease-in-out;
+      }
+    }
+
+    /* Color dorado al presionar (tap) para los enlaces del footer - MÓVIL */
+    @media (max-width: 991px) {
+      footer a:active,
+      footer .sitemap-list a:active,
+      footer .sitemap-links a:active {
+        color: var(--color-dorado-hover) !important;
+      }
+    }
+
+    /* Asegurar que los títulos no se vean como enlaces */
+    footer .sitemap-item-title:hover,
+    footer h3:hover {
+      color: inherit !important;
+      text-decoration: none !important;
     }
   </style>
 </head>
 <body>
-  <!-- gobmx.js inyecta header/pie institucionales; el script va en el footer -->
   <main class="page">
     <div class="container">
