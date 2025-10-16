@@ -150,6 +150,45 @@
 
     /* === 🦶 ESTILOS PARA FOOTER === */
     
+    /* Eliminar recuadro blanco al hacer click en enlaces del footer */
+    footer a,
+    footer a:focus,
+    footer a:active,
+    footer a:visited,
+    footer .accordion a,
+    footer .accordion a:focus,
+    footer .accordion a:active,
+    footer .nav-list a,
+    footer .nav-list a:focus,
+    footer .nav-list a:active {
+      outline: none !important;
+      border: none !important;
+      box-shadow: none !important;
+    }
+
+    /* Eliminar recuadro en labels del acordeón */
+    footer .accordion label,
+    footer .accordion label:focus,
+    footer .accordion label:active,
+    footer label[for^="toggle"],
+    footer label[for^="toggle"]:focus,
+    footer label[for^="toggle"]:active {
+      outline: none !important;
+      border: none !important;
+      box-shadow: none !important;
+    }
+
+    /* Eliminar recuadro en el input del acordeón */
+    footer .accordion-toggle,
+    footer .accordion-toggle:focus,
+    footer .accordion-toggle:active,
+    footer input[type="checkbox"],
+    footer input[type="checkbox"]:focus {
+      outline: none !important;
+      border: none !important;
+      box-shadow: none !important;
+    }
+    
     /* Quitar cursor pointer de Enlaces y ¿Qué es gob.mx? SOLO EN PC */
     @media (min-width: 992px) {
       footer .accordion label,
