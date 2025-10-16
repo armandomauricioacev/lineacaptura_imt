@@ -32,6 +32,38 @@
       font-family: "Montserrat", "Open Sans", Arial, sans-serif;
     }
 
+    /* === 🚫 ELIMINAR TOOLTIPS (title) EN HEADER Y FOOTER === */
+    header a[title],
+    header button[title],
+    header .navbar a[title],
+    header .navbar button[title],
+    footer a[title],
+    footer button[title],
+    footer .accordion a[title],
+    footer .nav-list a[title] {
+      position: relative;
+    }
+
+    header a[title]:hover::after,
+    header button[title]:hover::after,
+    header .navbar a[title]:hover::after,
+    header .navbar button[title]:hover::after,
+    footer a[title]:hover::after,
+    footer button[title]:hover::after,
+    footer .accordion a[title]:hover::after,
+    footer .nav-list a[title]:hover::after {
+      content: none !important;
+      display: none !important;
+    }
+
+    /* Ocultar tooltips nativos del navegador */
+    header [title]:hover::before,
+    header [title]:hover::after,
+    footer [title]:hover::before,
+    footer [title]:hover::after {
+      display: none !important;
+    }
+
     /* Eliminar TODO efecto hover/focus en header gob.mx */
     header.main-header a:hover,
     header.main-header a:focus,
@@ -251,7 +283,74 @@
       color: inherit !important;
       text-decoration: none !important;
     }
+
+    /* === 📐 ALINEAR TEXTO "Es el portal único..." CON "Participa" === */
+    footer .accordion section p {
+      margin-top: 0 !important;
+      padding-top: 0 !important;
+    }
+
+    footer .accordion section div {
+      padding-top: 0 !important;
+    }
+
+    /* Ajustar el espacio entre el título y el contenido del acordeón */
+    footer .accordion section {
+      padding-top: 0 !important;
+    }
   </style>
+
+  <script>
+    // Función para eliminar todos los atributos title
+    function removeAllTitles() {
+      // Eliminar title de TODO el documento
+      const allElements = document.querySelectorAll('[title]');
+      allElements.forEach(function(element) {
+        element.removeAttribute('title');
+      });
+    }
+
+    // Ejecutar múltiples veces para asegurar que se eliminen
+    document.addEventListener('DOMContentLoaded', function() {
+      removeAllTitles();
+      
+      // Ejecutar varias veces con diferentes delays
+      setTimeout(removeAllTitles, 100);
+      setTimeout(removeAllTitles, 300);
+      setTimeout(removeAllTitles, 500);
+      setTimeout(removeAllTitles, 1000);
+      setTimeout(removeAllTitles, 2000);
+    });
+
+    // También ejecutar cuando la página esté completamente cargada
+    window.addEventListener('load', function() {
+      removeAllTitles();
+      setTimeout(removeAllTitles, 500);
+    });
+
+    // Observar cambios en el DOM y eliminar titles que se agreguen dinámicamente
+    if (window.MutationObserver) {
+      const observer = new MutationObserver(function(mutations) {
+        mutations.forEach(function(mutation) {
+          if (mutation.type === 'attributes' && mutation.attributeName === 'title') {
+            mutation.target.removeAttribute('title');
+          }
+          if (mutation.addedNodes.length > 0) {
+            removeAllTitles();
+          }
+        });
+      });
+
+      document.addEventListener('DOMContentLoaded', function() {
+        observer.observe(document.body, {
+          attributes: true,
+          childList: true,
+          subtree: true,
+          attributeFilter: ['title']
+        });
+      });
+    }
+  </script>
 </head>
 <body>
   <main class="page">

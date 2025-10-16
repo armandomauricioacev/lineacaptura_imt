@@ -24,6 +24,17 @@
     .total-container .total-amount { font-size: 2em; color: #000; font-weight: normal; display: block; margin-top: 5px; }
     .table > thead > tr > th { font-weight: 600; color: #555; }
 
+        .crumb-link,
+.crumb-link:focus,
+.crumb-link:active,
+.crumb-link:focus-visible {
+  outline: none !important;
+  box-shadow: none !important;
+  border: 0 !important;
+}
+.crumb-link::-moz-focus-inner { border: 0; }
+.crumb-link { -webkit-tap-highlight-color: transparent; }
+
     /* Apila las dos cajas principales en pantallas medianas */
     @media (max-width: 991px) {
         .equal-panels > [class*="col-"] {
@@ -72,7 +83,7 @@
   
   {{-- Breadcrumb, Título y Pasos --}}
   <ol class="breadcrumb" style="margin-top:10px">
-    <li><a href="{{ url('/') }}">Inicio</a></li>
+    <li><a href="{{ url('/') }}" class="crumb-link">Inicio</a></li>
     <li>Instituto Mexicano del Transporte</li>
   </ol>
   <center><h1 style="margin:10px 0 6px;">Instituto Mexicano del Transporte</h1></center>

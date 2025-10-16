@@ -16,6 +16,20 @@
     .btn-quitar { color: #a94442; background: transparent; border: none; font-size: 1.5em; line-height: 1; padding: 0 5px; cursor: pointer; }
     .btn-quitar:hover { color: #7a2b29; }
 
+    /* Quitar recuadro/halo del link del breadcrumb */
+.crumb-link,
+.crumb-link:focus,
+.crumb-link:active,
+.crumb-link:focus-visible {
+  outline: none !important;
+  box-shadow: none !important;
+  border: 0 !important;
+}
+.crumb-link::-moz-focus-inner { border: 0; }
+.crumb-link { -webkit-tap-highlight-color: transparent; }
+
+
+
     /* Estilos del contenedor del total */
     .total-container { text-align: center; margin-top: 20px; padding: 20px; border-top: 1px solid #eee; }
     .total-container .total-label { font-size: 1.5em; color: #333; font-weight: normal; }
@@ -54,9 +68,10 @@
 
   {{-- Breadcrumb --}}
   <ol class="breadcrumb" style="margin-top:10px">
-    <li><a href="{{ url('/') }}">Inicio</a></li>
+    <li><a href="{{ url('/') }}" class="crumb-link">Inicio</a></li>
     <li>Instituto Mexicano del Transporte</li>
   </ol>
+
 
   <div id="alert-placeholder" style="margin-top: 15px;"></div>
 
@@ -230,6 +245,10 @@ document.addEventListener('DOMContentLoaded', function () {
         const tramiteId = selectedOption.value;
         if (tramitesSeleccionados.some(t => t.id === tramiteId)) {
             showAlert('Este trámite ya ha sido agregado a la lista.');
+            // =====> INICIO DE LA MODIFICACIÓN <=====
+            // Se agrega esta línea para mover la pantalla hacia el mensaje de alerta.
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            // =====> FIN DE LA MODIFICACIÓN <=====
             this.selectedIndex = 0;
             return;
         }

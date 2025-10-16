@@ -4,6 +4,39 @@
 
 @section('content')
 <br>
+
+<!-- Estilos: botón con apariencia de link y SIN recuadro al presionar -->
+<style>
+  .dep-link {
+    background: none;
+    border: 0;
+    padding: 0;
+    margin: 0;
+    cursor: pointer;
+    color: inherit;
+    text-decoration: underline;
+    -webkit-tap-highlight-color: transparent; /* quita flash en móviles */
+  }
+  /* Apaga cualquier contorno/halo al enfocarse o activarse */
+  .dep-link:focus,
+  .dep-link:active,
+  .dep-link:focus-visible {
+    outline: none !important;
+    box-shadow: none !important;
+    border: 0 !important;
+  }
+  .dep-link::-moz-focus-inner { border: 0; } /* Firefox */
+  /* Si algo del theme mete sombras/outline, lo neutralizamos dentro del panel */
+  .panel-body .dep-link,
+  .panel-body .dep-link:focus,
+  .panel-body .dep-link:active,
+  .panel-body .dep-link:focus-visible {
+    outline: none !important;
+    box-shadow: none !important;
+    border: 0 !important;
+  }
+</style>
+
   {{-- LOGOS: centrados en XS, en extremos desde SM+ --}}
   <div class="row" style="margin-top:15px; margin-bottom:10px">
     {{-- Izquierda --}}
@@ -70,13 +103,18 @@
           {{-- Iteramos por las dependencias --}}
           @foreach ($dependencias as $dependencia)
             <div>
-              {{-- Al hacer clic, guardamos el ID de la dependencia en la sesión y redirigimos --}}
-              <a href="{{ route('tramite.store') }}" style="text-decoration:underline;" 
-                 onclick="event.preventDefault(); document.getElementById('dependencia-form-{{ $dependencia->id }}').submit();">
+              {{-- Botón que envía el form oculto (sin JS) y se ve como link --}}
+              <button type="submit"
+                      class="dep-link"
+                      form="dependencia-form-{{ $dependencia->id }}">
                 {{ $dependencia->nombre }}
-              </a>
+              </button>
+
               {{-- Formulario oculto para guardar el ID de la dependencia --}}
-              <form id="dependencia-form-{{ $dependencia->id }}" action="{{ route('tramite.store') }}" method="POST" style="display: none;">
+              <form id="dependencia-form-{{ $dependencia->id }}"
+                    action="{{ route('tramite.store') }}"
+                    method="POST"
+                    style="display:none;">
                   @csrf
                   <input type="hidden" name="dependenciaId" value="{{ $dependencia->id }}">
               </form>
@@ -94,13 +132,12 @@
 
 @push('scripts')
 <script>
-    (function () {
-        // Previene que se pueda volver atrás en el historial del navegador.
-        // Al intentar retroceder, simplemente se recarga la página actual.
-        history.pushState(null, document.title, location.href);
-        window.addEventListener('popstate', function () {
-            history.pushState(null, document.title, location.href);
-        });
-    })();
+  (function () {
+    // Previene que se pueda volver atrás en el historial del navegador.
+    history.pushState(null, document.title, location.href);
+    window.addEventListener('popstate', function () {
+      history.pushState(null, document.title, location.href);
+    });
+  })();
 </script>
 @endpush

@@ -18,6 +18,16 @@
     .btn-gob-outline:hover,
     .btn-gob-outline:focus{ background:var(--gob-rojo) !important; color:#fff !important; border-color:var(--gob-rojo) !important; box-shadow:none !important; text-decoration:none !important; outline: none !important; }
     .error-message { display: none; color: #a94442; margin-top: 5px; font-size: 12px; }
+    .crumb-link,
+.crumb-link:focus,
+.crumb-link:active,
+.crumb-link:focus-visible {
+  outline: none !important;
+  box-shadow: none !important;
+  border: 0 !important;
+}
+.crumb-link::-moz-focus-inner { border: 0; }
+.crumb-link { -webkit-tap-highlight-color: transparent; }
     @media (max-width:575px){
       #pasos .nav-pills{ flex-direction:column; align-items:center; flex-wrap:nowrap; }
       #pasos .nav-pills>li>a{ width:100%; max-width:280px; min-width:240px; }
@@ -29,7 +39,7 @@
 
   {{-- Breadcrumb --}}
   <ol class="breadcrumb" style="margin-top:10px">
-    <li><a href="{{ url('/') }}">Inicio</a></li>
+    <li><a href="{{ url('/') }}" class="crumb-link">Inicio</a></li>
     <li>Instituto Mexicano del Transporte</li>
   </ol>
 
