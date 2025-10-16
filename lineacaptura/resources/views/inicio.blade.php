@@ -5,7 +5,6 @@
 @section('content')
 <br>
 
-<!-- Estilos: botón con apariencia de link y SIN recuadro al presionar -->
 <style>
   .dep-link {
     background: none;
@@ -13,10 +12,12 @@
     padding: 0;
     margin: 0;
     cursor: pointer;
-    color: inherit;
+    color: #007bff; /* Azul más fuerte y visible */
     text-decoration: underline;
     -webkit-tap-highlight-color: transparent; /* quita flash en móviles */
+    transition: color 0.2s ease; /* Transición suave para el cambio de color */
   }
+
   /* Apaga cualquier contorno/halo al enfocarse o activarse */
   .dep-link:focus,
   .dep-link:active,
@@ -25,7 +26,9 @@
     box-shadow: none !important;
     border: 0 !important;
   }
+
   .dep-link::-moz-focus-inner { border: 0; } /* Firefox */
+
   /* Si algo del theme mete sombras/outline, lo neutralizamos dentro del panel */
   .panel-body .dep-link,
   .panel-body .dep-link:focus,
