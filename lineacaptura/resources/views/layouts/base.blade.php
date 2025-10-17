@@ -1,5 +1,5 @@
-@include('partials.header')
+@include('forms.partials.header')
 
   @yield('content')
 
-@include('partials.footer')
+@include('forms.partials.footer')
