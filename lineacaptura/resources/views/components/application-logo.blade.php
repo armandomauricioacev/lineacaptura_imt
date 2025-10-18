@@ -1,1 +1,0 @@
-<img src="{{ asset('img/imt.png') }}" alt="Logo del IMT" {{ $attributes }}>

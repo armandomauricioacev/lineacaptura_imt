@@ -13,6 +13,12 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware) {
         $middleware->alias([
             'ensure.step' => \App\Http\Middleware\EnsureValidStep::class,
+            'validate.flow' => \App\Http\Middleware\ValidateFlowStep::class,
+        ]);
+
+        // 🔒 Aplicar headers de seguridad a todas las rutas web
+        $middleware->web(append: [
+            \App\Http\Middleware\SecurityHeaders::class,
         ]);
 
         // Redirigir usuarios no autenticados al login (usar URL directa, NO route())

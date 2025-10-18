@@ -168,11 +168,7 @@
   {{-- Acciones --}}
   <div class="row nav-actions" style="margin-top:16px">
     <div class="col-xs-6">
-      <form action="{{ route('regresar') }}" method="POST" style="display: inline;">
-        @csrf
-        <input type="hidden" name="paso_actual" value="pago">
-        <button type="submit" class="btn btn-gob-outline" aria-label="Regresar al paso anterior">Regresar</button>
-      </form>
+      <a href="{{ route('regresar') }}?paso_actual=pago" class="btn btn-gob-outline" aria-label="Regresar al paso anterior">Regresar</a>
     </div>
     <div class="col-xs-6 text-right">
       <form action="{{ route('linea.generar') }}" method="POST" style="display: inline;">

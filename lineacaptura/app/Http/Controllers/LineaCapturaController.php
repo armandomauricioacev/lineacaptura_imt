@@ -7,6 +7,7 @@ use App\Models\Tramite;
 use App\Models\LineasCapturadas;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Log;
 
 class LineaCapturaController extends Controller
 {
@@ -15,6 +16,13 @@ class LineaCapturaController extends Controller
      */
     public function index(Request $request)
     {
+        // 📊 Log de acceso a página inicial
+        Log::info('🏠 Acceso a página inicial', [
+            'ip' => $request->ip(),
+            'user_agent' => $request->headers->get('user-agent'),
+            'timestamp' => now()
+        ]);
+
         // Limpia el flujo
         $request->session()->forget([
             'dependenciaId',
@@ -30,23 +38,37 @@ class LineaCapturaController extends Controller
     }
 
     /**
-     * GET/POST /tramite
-     * GET: muestra trámites
-     * POST: recibe dependenciaId y redirige a GET /tramite
+     * GET/POST /tramite (mostrar formulario de trámites)
+     * Si es POST, recibe selección de dependencia desde inicio
      */
     public function showTramite(Request $request)
     {
+        // Si es POST, procesar la selección de dependencia
         if ($request->isMethod('post')) {
-            $request->validate([
-                'dependenciaId' => 'required|integer|exists:dependencias,id'
+            $validated = $request->validate([
+                'dependenciaId' => 'required|integer|exists:dependencias,id',
             ]);
-            $request->session()->put('dependenciaId', $request->input('dependenciaId'));
-            return redirect()->route('tramite.show');
+
+            // 📊 Log de selección de dependencia
+            Log::info('🏛️ Dependencia seleccionada', [
+                'dependencia_id' => $validated['dependenciaId'],
+                'ip' => $request->ip(),
+                'timestamp' => now()
+            ]);
+
+            $request->session()->put('dependenciaId', $validated['dependenciaId']);
         }
 
         $dependenciaId = $request->session()->get('dependenciaId');
         if (!$dependenciaId) {
-            return redirect()->route('inicio');
+            // 🚨 Log de intento de acceso sin dependencia
+            Log::warning('⚠️ Intento de acceso a trámites sin dependencia', [
+                'ip' => $request->ip(),
+                'user_agent' => $request->headers->get('user-agent'),
+                'timestamp' => now()
+            ]);
+            
+            return redirect()->route('inicio')->with('error', 'Por favor, selecciona una dependencia primero.');
         }
 
         $dependencia = Dependencia::findOrFail($dependenciaId);
@@ -62,16 +84,47 @@ class LineaCapturaController extends Controller
     }
 
     /**
+     * POST /tramite (recibe selección de dependencia desde inicio)
+     */
+    public function storeDependenciaSelection(Request $request)
+    {
+        $validated = $request->validate([
+            'dependenciaId' => 'required|integer|exists:dependencias,id',
+        ]);
+
+        $request->session()->put('dependenciaId', $validated['dependenciaId']);
+
+        return redirect()->route('tramite.show');
+    }
+
+    /**
      * POST /persona  (recibe selección de trámites)
      */
     public function storeTramiteSelection(Request $request)
     {
+        // 📊 Log mejorado para debugging y seguridad
+        Log::info('📋 Selección de trámites iniciada', [
+            'ip' => $request->ip(),
+            'user_agent' => $request->headers->get('user-agent'),
+            'dependencia_id' => $request->session()->get('dependenciaId'),
+            'timestamp' => now()
+        ]);
+
         $validated = $request->validate([
             'tramite_ids'   => 'required|array|min:1|max:10',
             'tramite_ids.*' => 'integer|exists:tramites,id',
         ]);
 
         $request->session()->put('tramites_seleccionados', $validated['tramite_ids']);
+
+        // 📊 Log de trámites guardados con más contexto
+        Log::info('✅ Trámites guardados en sesión', [
+            'tramites_seleccionados' => $validated['tramite_ids'],
+            'cantidad_tramites' => count($validated['tramite_ids']),
+            'dependencia_id' => $request->session()->get('dependenciaId'),
+            'ip' => $request->ip(),
+            'timestamp' => now()
+        ]);
 
         return redirect()->route('persona.show');
     }
@@ -94,10 +147,31 @@ class LineaCapturaController extends Controller
     }
 
     /**
+     * GET /persona - Maneja recargas de página
+     */
+    public function showPersonaReload(Request $request)
+    {
+        // Validar que tenga los datos necesarios en sesión
+        if (!$request->session()->has('dependenciaId') || !$request->session()->has('tramites_seleccionados')) {
+            return redirect()->route('inicio')->with('error', 'Por favor, inicia el proceso nuevamente.');
+        }
+
+        return $this->showPersonaForm($request);
+    }
+
+    /**
      * POST /pago (recibe datos de persona y redirige a pago)
      */
     public function storePersonaData(Request $request)
     {
+        // 📊 Log de inicio de captura de datos personales
+        Log::info('👤 Captura de datos personales iniciada', [
+            'tipo_persona' => $request->input('tipo_persona'),
+            'ip' => $request->ip(),
+            'dependencia_id' => $request->session()->get('dependenciaId'),
+            'timestamp' => now()
+        ]);
+
         $tipoPersona = $request->input('tipo_persona');
 
         $rules = ['tipo_persona' => 'required|in:fisica,moral'];
@@ -130,6 +204,16 @@ class LineaCapturaController extends Controller
 
         $request->session()->put('persona_data', $validatedData);
 
+        // 📊 Log de datos personales guardados (sin datos sensibles)
+        Log::info('✅ Datos personales validados y guardados', [
+            'tipo_persona' => $tipoPersona,
+            'tiene_rfc' => !empty($validatedData['rfc']),
+            'tiene_curp' => !empty($validatedData['curp'] ?? null),
+            'ip' => $request->ip(),
+            'dependencia_id' => $request->session()->get('dependenciaId'),
+            'timestamp' => now()
+        ]);
+
         return redirect()->route('pago.show');
     }
 
@@ -155,15 +239,76 @@ class LineaCapturaController extends Controller
     }
 
     /**
+     * GET /pago - Maneja recargas de página
+     */
+    public function showPagoReload(Request $request)
+    {
+        // Validar que tenga todos los datos necesarios en sesión
+        if (!$request->session()->has('dependenciaId') || 
+            !$request->session()->has('tramites_seleccionados') || 
+            !$request->session()->has('persona_data')) {
+            return redirect()->route('inicio')->with('error', 'Por favor, inicia el proceso nuevamente.');
+        }
+
+        return $this->showPagoPage($request);
+    }
+
+    /**
+     * GET /generar-linea - Maneja recargas de página
+     */
+    public function showLineaCapturada(Request $request)
+    {
+        // Si hay una línea capturada finalizada en sesión, mostrarla
+        if ($request->session()->has('linea_capturada_finalizada')) {
+            // Obtener la última línea capturada del usuario (simulamos por IP por ahora)
+            $ultimaLinea = LineasCapturadas::latest()->first();
+            
+            if ($ultimaLinea) {
+                $jsonArray = json_decode($ultimaLinea->json_generado, true);
+                $respuestaSat = [
+                    'exito' => $ultimaLinea->procesado_exitosamente,
+                    'datos' => json_decode($ultimaLinea->json_recibido, true),
+                    'html_decodificado' => $ultimaLinea->html_codificado ? base64_decode($ultimaLinea->html_codificado) : null
+                ];
+                
+                return view('forms.lineacaptura', [
+                    'lineaCapturada' => $ultimaLinea,
+                    'jsonParaSat'    => json_encode($jsonArray, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE),
+                    'respuestaSat'   => $respuestaSat
+                ]);
+            }
+        }
+        
+        // Si no hay línea capturada, redirigir al inicio
+        return redirect()->route('inicio')->with('error', 'No hay línea de captura disponible. Por favor, inicia el proceso nuevamente.');
+    }
+
+    /**
      * POST /generar-linea
      */
     public function generarLineaCaptura(Request $request)
     {
+        // 📊 Log crítico de inicio de generación
+        Log::info('🎯 Generación de línea de captura iniciada', [
+            'ip' => $request->ip(),
+            'user_agent' => $request->headers->get('user-agent'),
+            'timestamp' => now()
+        ]);
+
         $dependenciaId = $request->session()->get('dependenciaId');
         $tramiteIds    = $request->session()->get('tramites_seleccionados');
         $personaData   = $request->session()->get('persona_data');
 
         if (!$dependenciaId || empty($tramiteIds) || !$personaData) {
+            // 🚨 Log de intento de generación sin datos completos
+            Log::warning('⚠️ Intento de generación sin datos completos', [
+                'tiene_dependencia' => !empty($dependenciaId),
+                'tiene_tramites' => !empty($tramiteIds),
+                'tiene_persona' => !empty($personaData),
+                'ip' => $request->ip(),
+                'timestamp' => now()
+            ]);
+
             return redirect()->route('inicio')
                 ->with('error', 'Tu sesión ha expirado, por favor inicia de nuevo.');
         }
@@ -245,6 +390,19 @@ class LineaCapturaController extends Controller
         // Reset del flujo y bandera final
         $request->session()->flush();
         $request->session()->put('linea_capturada_finalizada', true);
+
+        // 📊 Log crítico de línea de captura generada exitosamente
+        Log::info('🎉 Línea de captura generada exitosamente', [
+            'linea_id' => $lineaCapturada->id,
+            'solicitud' => $lineaCapturada->solicitud,
+            'dependencia_id' => $dependenciaId,
+            'cantidad_tramites' => count($tramiteIds),
+            'importe_total' => $importeTotalGeneralRedondeado,
+            'tipo_persona' => $personaData['tipo_persona'],
+            'procesado_exitosamente' => $respuestaSat['exito'] ?? false,
+            'ip' => $request->ip(),
+            'timestamp' => now()
+        ]);
 
         // Vista: resources/views/forms/lineacaptura.blade.php
         return view('forms.lineacaptura', [

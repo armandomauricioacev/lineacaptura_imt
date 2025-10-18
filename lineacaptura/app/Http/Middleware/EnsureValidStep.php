@@ -4,6 +4,7 @@ namespace App\Http\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Symfony\Component\HttpFoundation\Response;
 
 class EnsureValidStep
@@ -38,6 +39,20 @@ class EnsureValidStep
 
         // Si la ruta que el usuario intenta visitar NO es la que le corresponde...
         if ($currentRouteName !== $correctStepRoute) {
+            // 🚨 Log de intento de navegación no válida
+            Log::warning('🚫 Intento de navegación no válida detectado', [
+                'ruta_intentada' => $currentRouteName,
+                'ruta_correcta' => $correctStepRoute,
+                'ip' => $request->ip(),
+                'user_agent' => $request->headers->get('user-agent'),
+                'session_id' => $session->getId(),
+                'tiene_dependencia' => $session->has('dependenciaId'),
+                'tiene_tramites' => $session->has('tramites_seleccionados'),
+                'tiene_persona' => $session->has('persona_data'),
+                'proceso_finalizado' => $session->has('linea_capturada_finalizada'),
+                'timestamp' => now()
+            ]);
+
             // ...lo redirigimos a la fuerza a la página correcta.
             // Esto bloquea cualquier intento de navegar con la URL.
             return redirect()->route($correctStepRoute);

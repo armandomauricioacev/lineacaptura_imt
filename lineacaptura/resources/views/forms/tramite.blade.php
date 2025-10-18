@@ -136,11 +136,7 @@
   {{-- Navegación --}}
   <div class="row nav-actions" style="margin-top:10px">
     <div class="col-xs-6">
-      <form action="{{ route('regresar') }}" method="POST" style="display: inline;">
-          @csrf
-          <input type="hidden" name="paso_actual" value="tramite">
-          <button type="submit" class="btn btn-gob-outline" aria-label="Regresar al paso anterior">Regresar</button>
-      </form>
+      <a href="{{ route('regresar') }}?paso_actual=tramite" class="btn btn-gob-outline" aria-label="Regresar al paso anterior">Regresar</a>
     </div>
     <div class="col-xs-6 text-right">
       <button type="submit" class="btn btn-gob-outline" id="btnSiguiente" form="tramiteForm">Siguiente</button>
@@ -278,7 +274,28 @@ document.addEventListener('DOMContentLoaded', function () {
             event.preventDefault();
             showAlert('Debes agregar al menos un trámite para poder continuar.');
             window.scrollTo({ top: 0, behavior: 'smooth' });
+            return false;
         }
+        
+        // Prevenir el envío automático del formulario
+        event.preventDefault();
+        
+        // Crear inputs ocultos para los trámites seleccionados
+        const existingInputs = tramiteForm.querySelectorAll('input[name="tramite_ids[]"]');
+        existingInputs.forEach(input => input.remove());
+        
+        tramitesSeleccionados.forEach(tramite => {
+            const input = document.createElement('input');
+            input.type = 'hidden';
+            input.name = 'tramite_ids[]';
+            input.value = tramite.id;
+            tramiteForm.appendChild(input);
+        });
+        
+        // Enviar el formulario después de agregar los inputs
+        setTimeout(function() {
+            tramiteForm.submit();
+        }, 50);
     });
 
     // Script para bloquear las flechas del navegador
