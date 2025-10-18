@@ -161,6 +161,122 @@ $resultadoDecodificacion = obtenerYDecodificarCodigo();
     <div class="json-viewer"><code>{{ $jsonParaSat }}</code></div>
 </div>
 
+<!-- ==========================================================
+     SECCIÓN: JSON ENVIADO AL SAT
+     ========================================================== -->
+<div class="caja">
+    <h3 style="color: #2563eb; margin-bottom: 15px; font-size: 18px; font-weight: bold;">
+        📤 JSON Enviado al SAT
+    </h3>
+    <div class="json-viewer">
+        <pre style="background: #f8fafc; padding: 15px; border-radius: 8px; border: 1px solid #e2e8f0; font-size: 12px; line-height: 1.4; overflow-x: auto; white-space: pre-wrap;">{{ $jsonParaSat }}</pre>
+    </div>
+</div>
+
+<!-- ==========================================================
+     SECCIÓN: RESPUESTA DEL SAT
+     ========================================================== -->
+<div class="caja">
+    <h3 style="color: #059669; margin-bottom: 15px; font-size: 18px; font-weight: bold;">
+        📥 Respuesta del SAT
+    </h3>
+    
+    @if(isset($respuestaSat))
+        @if($respuestaSat['exito'])
+            <div class="alert-success">
+                <strong>✅ Conexión exitosa con la API del SAT</strong>
+                <p>El JSON fue enviado correctamente y se recibió una respuesta.</p>
+            </div>
+            
+            <!-- Datos de respuesta del SAT -->
+            <div style="margin-top: 20px;">
+                <h4 style="color: #374151; margin-bottom: 10px;">📋 Datos de la Respuesta:</h4>
+                <div style="background: #f0f9ff; padding: 15px; border-radius: 8px; border: 1px solid #0ea5e9;">
+                    <p><strong>Código HTTP:</strong> {{ $respuestaSat['codigo_http'] ?? 'N/A' }}</p>
+                    <p><strong>Estado:</strong> Procesado exitosamente</p>
+                    @if(isset($respuestaSat['datos']))
+                        <p><strong>Datos recibidos:</strong> Sí ({{ count($respuestaSat['datos']) }} campos)</p>
+                    @endif
+                </div>
+            </div>
+
+            <!-- JSON completo de respuesta -->
+            @if(isset($respuestaSat['datos']))
+            <div style="margin-top: 20px;">
+                <h4 style="color: #374151; margin-bottom: 10px;">📄 JSON Completo del SAT:</h4>
+                <div class="json-viewer">
+                    <pre style="background: #f0fdf4; padding: 15px; border-radius: 8px; border: 1px solid #22c55e; font-size: 12px; line-height: 1.4; overflow-x: auto; white-space: pre-wrap;">{{ json_encode($respuestaSat['datos'], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) }}</pre>
+                </div>
+            </div>
+            @endif
+
+            <!-- Vista previa del HTML (cuando esté disponible) -->
+            @if(isset($respuestaSat['html_decodificado']) && $respuestaSat['html_decodificado'])
+            <div style="margin-top: 20px;">
+                <h4 style="color: #374151; margin-bottom: 10px;">🖥️ Vista Previa del Documento:</h4>
+                <div style="background: #fefce8; padding: 15px; border-radius: 8px; border: 1px solid #eab308;">
+                    <div class="html-decoded">
+                        <iframe srcdoc="{{ htmlspecialchars($respuestaSat['html_decodificado']) }}" 
+                                style="width: 100%; height: 400px; border: 1px solid #d1d5db; border-radius: 4px;">
+                        </iframe>
+                    </div>
+                    <div style="margin-top: 15px; text-align: center;">
+                        <button onclick="descargarHTML()" 
+                                style="background: #059669; color: white; padding: 10px 20px; border: none; border-radius: 6px; margin-right: 10px; cursor: pointer; font-weight: bold;">
+                            💾 Descargar HTML
+                        </button>
+                        <button onclick="abrirEnNuevaVentana()" 
+                                style="background: #2563eb; color: white; padding: 10px 20px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold;">
+                            🔗 Abrir en Nueva Ventana
+                        </button>
+                    </div>
+                </div>
+            </div>
+            @endif
+
+        @else
+            <!-- Error en la comunicación con el SAT -->
+             <div style="background: #fef2f2; border: 1px solid #fca5a5; border-radius: 8px; padding: 15px; color: #dc2626;">
+                 <strong>❌ Error en la comunicación con el SAT</strong>
+                 <p><strong>Error:</strong> {{ $respuestaSat['error'] ?? 'Error desconocido' }}</p>
+                 @if(isset($respuestaSat['codigo_http']))
+                     <p><strong>Código HTTP:</strong> {{ $respuestaSat['codigo_http'] }}</p>
+                 @endif
+                 <p><em>Nota: Esto es normal mientras no tengas configurada la URL real de la API del SAT.</em></p>
+                 
+                 <!-- Recordatorio de configuración -->
+                 <div style="background: #fef3c7; border: 1px solid #f59e0b; border-radius: 6px; padding: 12px; margin-top: 15px; color: #92400e;">
+                     <strong>📝 Recordatorio de Configuración:</strong>
+                     <p style="margin: 8px 0 4px 0;">Cuando recibas las credenciales del SAT, configura:</p>
+                     <ul style="margin: 5px 0; padding-left: 20px; font-size: 13px;">
+                         <li><strong>Archivo:</strong> <code>.env</code> (en la raíz del proyecto)</li>
+                         <li><strong>Variable:</strong> <code>SAT_API_URL=https://url-real-del-sat.gob.mx/api</code></li>
+                         <li><strong>Token (si aplica):</strong> <code>SAT_API_TOKEN=tu_token_aqui</code></li>
+                         <li><strong>Key (si aplica):</strong> <code>SAT_API_KEY=tu_key_aqui</code></li>
+                     </ul>
+                     <p style="margin: 8px 0 0 0; font-size: 12px;">
+                         💡 <strong>Tip:</strong> Puedes copiar las variables desde <code>.env.example</code> y solo cambiar los valores.
+                     </p>
+                 </div>
+             </div>
+
+            <!-- Mostrar respuesta cruda si existe -->
+            @if(isset($respuestaSat['respuesta_cruda']) && $respuestaSat['respuesta_cruda'])
+            <div style="margin-top: 15px;">
+                <h4 style="color: #374151; margin-bottom: 10px;">🔍 Respuesta Cruda del Servidor:</h4>
+                <div class="json-viewer">
+                    <pre style="background: #fef2f2; padding: 15px; border-radius: 8px; border: 1px solid #fca5a5; font-size: 12px; line-height: 1.4; overflow-x: auto; white-space: pre-wrap;">{{ $respuestaSat['respuesta_cruda'] }}</pre>
+                </div>
+            </div>
+            @endif
+        @endif
+    @else
+        <div style="background: #f3f4f6; border: 1px solid #d1d5db; border-radius: 8px; padding: 15px; color: #6b7280;">
+            <p>⏳ No se ha enviado ninguna solicitud al SAT aún.</p>
+        </div>
+    @endif
+</div>
+
 <div class="caja">
     <h4>Decodificación del Archivo codigo.txt</h4>
     <p>Contenido HTML decodificado del archivo codigo.txt con soporte completo para caracteres especiales en español.</p>
@@ -227,5 +343,58 @@ $resultadoDecodificacion = obtenerYDecodificarCodigo();
             history.pushState(null, document.title, location.href);
         });
     })();
+
+    // ==========================================================
+    //  FUNCIONES PARA DESCARGAR Y ABRIR HTML DEL SAT
+    // ==========================================================
+    
+    /**
+     * Descarga el HTML decodificado del SAT como archivo
+     */
+    function descargarHTML() {
+        @if(isset($respuestaSat['html_decodificado']) && $respuestaSat['html_decodificado'])
+        const htmlContent = {!! json_encode($respuestaSat['html_decodificado']) !!};
+        
+        if (htmlContent && htmlContent.trim() !== '') {
+            const blob = new Blob([htmlContent], { type: 'text/html' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.style.display = 'none';
+            a.href = url;
+            a.download = 'documento_sat_{{ date("Y-m-d_H-i-s") }}.html';
+            document.body.appendChild(a);
+            a.click();
+            window.URL.revokeObjectURL(url);
+            document.body.removeChild(a);
+        } else {
+            alert('No hay contenido HTML disponible para descargar.');
+        }
+        @else
+        alert('No hay contenido HTML disponible para descargar.');
+        @endif
+    }
+    
+    /**
+     * Abre el HTML decodificado en una nueva ventana
+     */
+    function abrirEnNuevaVentana() {
+        @if(isset($respuestaSat['html_decodificado']) && $respuestaSat['html_decodificado'])
+        const htmlContent = {!! json_encode($respuestaSat['html_decodificado']) !!};
+        
+        if (htmlContent && htmlContent.trim() !== '') {
+            const nuevaVentana = window.open('', '_blank');
+            if (nuevaVentana) {
+                nuevaVentana.document.write(htmlContent);
+                nuevaVentana.document.close();
+            } else {
+                alert('No se pudo abrir la nueva ventana. Verifica que no esté bloqueada por el navegador.');
+            }
+        } else {
+            alert('No hay contenido HTML disponible para mostrar.');
+        }
+        @else
+        alert('No hay contenido HTML disponible para mostrar.');
+        @endif
+    }
 </script>
 @endpush

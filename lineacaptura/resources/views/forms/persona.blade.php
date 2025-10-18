@@ -242,6 +242,41 @@ document.addEventListener('DOMContentLoaded', function () {
             errorElement.style.display = 'none';
         }
     }
+
+    // Función para validar la CURP
+    function validaCurp(curp) {
+        // Expresión regular para validar la estructura de la CURP
+        const regex = /^[A-Z][AEIOUX][A-Z][A-Z][0-9]{2}[0-9]{2}[0-9]{2}[HMX][A-Z]{2}[^0-9AEIOU][^0-9AEIOU][^0-9AEIOU][0-9A-J][0-9]$/;
+        // Verifica si la CURP cumple con la expresión regular
+        if (regex.test(curp)) {
+            // Extrae el dígito verificador de la CURP
+            const digitoProporcionado = parseInt(curp.charAt(17), 10);
+            // Calcula el dígito verificador de los primeros 17 caracteres
+            const digitoCalculado = digitoVerificador(curp.substring(0, 17));
+            // Compara el dígito verificador calculado con el proporcionado
+            return digitoCalculado === digitoProporcionado;
+        }
+        return false;
+    }
+
+    // Función para calcular el dígito verificador de la CURP
+    function digitoVerificador(string) {
+        const caracteres = '0123456789ABCDEFGHIJKLMN*OPQRSTUVWXYZ';
+        let factor = 19;
+        let suma = 0;
+
+        // Recorre los caracteres del string
+        for (let i = 0; i < string.length; i++) {
+            factor--;
+            const char = string.charAt(i);
+            const pos = caracteres.indexOf(char);
+            suma += pos * factor;
+        }
+
+        // Calcula el dígito verificador
+        const digito = 10 - suma % 10;
+        return digito === 10 ? 0 : digito;
+    }
     
     document.getElementById('btn-continuar').addEventListener('click', function(event) {
         event.preventDefault(); 
@@ -288,6 +323,9 @@ document.addEventListener('DOMContentLoaded', function () {
                 } else if (input.pattern && !new RegExp('^' + input.pattern + '$').test(input.value)) {
                     showError(input.id, input.title || 'El formato no es válido.');
                     hasError = true;
+                } else if (input.id === 'curp' && !validaCurp(input.value)) {
+                    showError(input.id, 'La CURP no es válida. Verifica el dígito verificador.');
+                    hasError = true;
                 }
                 if (hasError) {
                     isValid = false;
@@ -311,6 +349,8 @@ document.addEventListener('DOMContentLoaded', function () {
                 showError(this.id, 'Este campo es obligatorio.');
             } else if (this.pattern && !new RegExp('^' + this.pattern + '$').test(this.value)) {
                 showError(this.id, this.title || 'El formato no es válido.');
+            } else if (this.id === 'curp' && !validaCurp(this.value)) {
+                showError(this.id, 'La CURP no es válida. Verifica el dígito verificador.');
             } else {
                 hideError(this.id);
             }

@@ -38,6 +38,21 @@ class LineasCapturadas extends Model
         'importe_iva',
         'importe_total',
         'json_generado',
+
+        // ==========================================================
+        //  CAMPOS ADICIONALES DEL SAT
+        // ==========================================================
+        'json_recibido',
+        'id_documento',
+        'tipo_pago',
+        'html_codificado',
+        'resultado',
+        'linea_captura',
+        'importe_sat',
+        'fecha_vigencia_sat',
+        'errores_sat',
+        'fecha_respuesta_sat',
+        'procesado_exitosamente',
     ];
 
     /**
@@ -46,7 +61,14 @@ class LineasCapturadas extends Model
      * @var array<string, string>
      */
     protected $casts = [
-        'json_generado' => 'array', // Para que Laravel lo maneje como un array
+        'fecha_solicitud' => 'date',
+        'fecha_vigencia' => 'date',
+        'fecha_vigencia_sat' => 'date',
+        'fecha_respuesta_sat' => 'datetime',
+        'json_generado' => 'array',
+        'json_recibido' => 'array',
+        'errores_sat' => 'array',
+        'procesado_exitosamente' => 'boolean',
     ];
 
     // Relaciones

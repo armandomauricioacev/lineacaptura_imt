@@ -207,6 +207,41 @@ class LineaCapturaController extends Controller
         $lineaCapturada->json_generado = json_encode($jsonArray);
         $lineaCapturada->save();
 
+        // ==========================================================
+        //  INTEGRACIÓN CON API DEL SAT
+        // ==========================================================
+        $respuestaSat = $this->enviarJsonASat($jsonArray);
+        
+        if ($respuestaSat['exito']) {
+            // Procesar respuesta exitosa del SAT
+            $datosProcesados = $this->procesarRespuestaSat($respuestaSat['datos'], json_encode($respuestaSat['datos']));
+            
+            // Actualizar el registro con la respuesta del SAT
+            $lineaCapturada->update([
+                'json_recibido' => json_encode($respuestaSat['datos']),
+                'id_documento' => $datosProcesados['id_documento'] ?? null,
+                'tipo_pago' => $datosProcesados['tipo_pago'] ?? null,
+                'html_codificado' => $datosProcesados['html_codificado'] ?? null,
+                'resultado' => $datosProcesados['resultado'] ?? null,
+                'linea_captura' => $datosProcesados['linea_captura'] ?? null,
+                'importe_sat' => $datosProcesados['importe_sat'] ?? null,
+                'fecha_vigencia_sat' => $datosProcesados['fecha_vigencia_sat'] ?? null,
+                'errores_sat' => null,
+                'fecha_respuesta_sat' => now(),
+                'procesado_exitosamente' => true
+            ]);
+            
+            // Agregar HTML decodificado a la respuesta para la vista
+            $respuestaSat['html_decodificado'] = $datosProcesados['html_decodificado'] ?? null;
+        } else {
+            // Guardar errores del SAT
+            $lineaCapturada->update([
+                'errores_sat' => json_encode(['error' => $respuestaSat['error'] ?? 'Error desconocido']),
+                'fecha_respuesta_sat' => now(),
+                'procesado_exitosamente' => false
+            ]);
+        }
+
         // Reset del flujo y bandera final
         $request->session()->flush();
         $request->session()->put('linea_capturada_finalizada', true);
@@ -214,7 +249,8 @@ class LineaCapturaController extends Controller
         // Vista: resources/views/forms/lineacaptura.blade.php
         return view('forms.lineacaptura', [
             'lineaCapturada' => $lineaCapturada,
-            'jsonParaSat'    => json_encode($jsonArray, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE)
+            'jsonParaSat'    => json_encode($jsonArray, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE),
+            'respuestaSat'   => $respuestaSat
         ]);
     }
 
@@ -354,5 +390,364 @@ class LineaCapturaController extends Controller
         }
 
         return redirect()->route('inicio');
+    }
+
+    /**
+     * Función consolidada para validar y decodificar archivos JSON con HTML base64
+     * Combina las mejores características de los scripts de verificación
+     * 
+     * @param string $rutaArchivo Ruta al archivo JSON
+     * @return array Resultado de la validación y decodificación
+     */
+    public function validarYDecodificarJson(string $rutaArchivo): array
+    {
+        try {
+            // Verificar existencia del archivo
+            if (!file_exists($rutaArchivo)) {
+                return [
+                    'exito' => false,
+                    'error' => 'El archivo no existe en la ruta especificada',
+                    'ruta' => $rutaArchivo
+                ];
+            }
+
+            // Leer contenido del archivo
+            $contenido = file_get_contents($rutaArchivo);
+            $tamanoArchivo = strlen($contenido);
+
+            // Información básica del archivo
+            $info = [
+                'tamano_bytes' => $tamanoArchivo,
+                'primeros_100_chars' => substr($contenido, 0, 100),
+                'ultimos_100_chars' => substr($contenido, -100)
+            ];
+
+            // Limpiar contenido de posibles caracteres problemáticos
+            $contenidoLimpio = trim($contenido);
+
+            // Verificar formato JSON básico
+            if (!str_ends_with($contenidoLimpio, '}')) {
+                return [
+                    'exito' => false,
+                    'error' => 'El archivo JSON está incompleto - no termina con "}"',
+                    'info' => $info,
+                    'diagnostico' => [
+                        'termina_con_llave' => false,
+                        'ultimo_caracter' => substr($contenidoLimpio, -1)
+                    ]
+                ];
+            }
+
+            // Buscar caracteres de control problemáticos
+            $caracteresControl = [];
+            for ($i = 0; $i < strlen($contenido); $i++) {
+                $ascii = ord($contenido[$i]);
+                if ($ascii < 32 && $ascii !== 9 && $ascii !== 10 && $ascii !== 13) {
+                    $caracteresControl[] = [
+                        'posicion' => $i,
+                        'ascii' => $ascii,
+                        'hex' => dechex($ascii)
+                    ];
+                }
+            }
+
+            // Verificar balance de llaves
+            $llaves_abiertas = substr_count($contenido, '{');
+            $llaves_cerradas = substr_count($contenido, '}');
+
+            // Intentar decodificar JSON
+            $datosJson = json_decode($contenido, true);
+            
+            if (json_last_error() !== JSON_ERROR_NONE) {
+                return [
+                    'exito' => false,
+                    'error' => 'Error al decodificar JSON: ' . json_last_error_msg(),
+                    'info' => $info,
+                    'diagnostico' => [
+                        'codigo_error_json' => json_last_error(),
+                        'caracteres_control' => $caracteresControl,
+                        'balance_llaves' => [
+                            'abiertas' => $llaves_abiertas,
+                            'cerradas' => $llaves_cerradas,
+                            'balanceado' => $llaves_abiertas === $llaves_cerradas
+                        ]
+                    ]
+                ];
+            }
+
+            // Validar estructura esperada
+            $estructura = [
+                'tiene_datos_generales' => isset($datosJson['DatosGenerales']),
+                'tiene_acuse' => isset($datosJson['Acuse']),
+                'tiene_html' => isset($datosJson['Acuse']['HTML'])
+            ];
+
+            if (!$estructura['tiene_html']) {
+                return [
+                    'exito' => false,
+                    'error' => 'No se encontró el campo HTML en la estructura JSON',
+                    'info' => $info,
+                    'estructura' => $estructura,
+                    'claves_disponibles' => array_keys($datosJson)
+                ];
+            }
+
+            // Decodificar HTML base64
+            $htmlBase64 = $datosJson['Acuse']['HTML'];
+            $htmlDecodificado = html_entity_decode(base64_decode($htmlBase64), ENT_QUOTES | ENT_HTML5, 'UTF-8');
+
+            // Verificar que la decodificación fue exitosa
+            if (empty($htmlDecodificado)) {
+                return [
+                    'exito' => false,
+                    'error' => 'Error al decodificar el HTML base64',
+                    'info' => $info,
+                    'html_info' => [
+                        'longitud_base64' => strlen($htmlBase64),
+                        'primeros_50_chars' => substr($htmlBase64, 0, 50)
+                    ]
+                ];
+            }
+
+            // Éxito - retornar todos los datos
+            return [
+                'exito' => true,
+                'mensaje' => 'JSON validado y HTML decodificado exitosamente',
+                'info' => $info,
+                'estructura' => $estructura,
+                'datos_json' => $datosJson,
+                'html_base64' => $htmlBase64,
+                'html_decodificado' => $htmlDecodificado,
+                'estadisticas' => [
+                    'caracteres_control_encontrados' => count($caracteresControl),
+                    'longitud_html_base64' => strlen($htmlBase64),
+                    'longitud_html_decodificado' => strlen($htmlDecodificado),
+                    'balance_llaves_correcto' => $llaves_abiertas === $llaves_cerradas
+                ]
+            ];
+
+        } catch (\Exception $e) {
+            return [
+                'exito' => false,
+                'error' => 'Excepción durante el procesamiento: ' . $e->getMessage(),
+                'archivo' => $rutaArchivo
+            ];
+        }
+    }
+
+    /**
+     * Función auxiliar para corregir automáticamente JSON truncado
+     * 
+     * @param string $rutaArchivo Ruta al archivo JSON a corregir
+     * @return array Resultado de la corrección
+     */
+    public function corregirJsonTruncado(string $rutaArchivo): array
+    {
+        try {
+            if (!file_exists($rutaArchivo)) {
+                return [
+                    'exito' => false,
+                    'error' => 'El archivo no existe'
+                ];
+            }
+
+            $contenido = file_get_contents($rutaArchivo);
+            $contenidoOriginal = $contenido;
+            
+            // Limpiar caracteres problemáticos al final
+            $contenido = rtrim($contenido, ' "');
+            
+            // Verificar si necesita corrección
+            if ($contenido === $contenidoOriginal) {
+                return [
+                    'exito' => true,
+                    'mensaje' => 'El archivo no necesitaba corrección',
+                    'cambios_realizados' => false
+                ];
+            }
+
+            // Guardar archivo corregido
+            file_put_contents($rutaArchivo, $contenido);
+
+            return [
+                'exito' => true,
+                'mensaje' => 'Archivo JSON corregido exitosamente',
+                'cambios_realizados' => true,
+                'caracteres_removidos' => strlen($contenidoOriginal) - strlen($contenido)
+            ];
+
+        } catch (\Exception $e) {
+            return [
+                'exito' => false,
+                'error' => 'Error al corregir archivo: ' . $e->getMessage()
+            ];
+        }
+    }
+
+    /**
+     * Envía el JSON generado a la API del SAT para validación
+     * 
+     * @param array $jsonData Los datos JSON a enviar al SAT
+     * @return array Respuesta de la API del SAT
+     */
+    private function enviarJsonASat($jsonData)
+    {
+        // Obtener configuración de la API del SAT desde el archivo .env
+        $satApiUrl = env('SAT_API_URL', 'https://api.sat.gob.mx/validacion/linea-captura');
+        $satApiToken = env('SAT_API_TOKEN', null);
+        $satApiKey = env('SAT_API_KEY', null);
+        $timeout = env('SAT_API_TIMEOUT', 30);
+        
+        // Preparar headers para la petición
+        $headers = [
+            'Content-Type: application/json',
+            'Accept: application/json',
+            'User-Agent: LineaCaptura-IMT/1.0'
+        ];
+        
+        // Agregar token de autenticación si está configurado
+        if ($satApiToken) {
+            $headers[] = 'Authorization: Bearer ' . $satApiToken;
+        }
+        
+        // Agregar API Key si está configurada
+        if ($satApiKey) {
+            $headers[] = 'X-API-Key: ' . $satApiKey;
+        }
+        
+        // Inicializar cURL
+        $curl = curl_init();
+        
+        curl_setopt_array($curl, [
+            CURLOPT_URL => $satApiUrl,
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_ENCODING => '',
+            CURLOPT_MAXREDIRS => 10,
+            CURLOPT_TIMEOUT => $timeout,
+            CURLOPT_FOLLOWLOCATION => true,
+            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+            CURLOPT_CUSTOMREQUEST => 'POST',
+            CURLOPT_POSTFIELDS => json_encode($jsonData),
+            CURLOPT_HTTPHEADER => $headers,
+            CURLOPT_SSL_VERIFYPEER => true,
+            CURLOPT_SSL_VERIFYHOST => 2,
+        ]);
+        
+        $response = curl_exec($curl);
+        $httpCode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
+        $error = curl_error($curl);
+        
+        curl_close($curl);
+        
+        // Verificar errores de conexión
+        if ($error) {
+            return [
+                'exito' => false,
+                'error' => 'Error de conexión con la API del SAT: ' . $error,
+                'codigo_http' => 0
+            ];
+        }
+        
+        // Verificar código de respuesta HTTP
+        if ($httpCode !== 200) {
+            return [
+                'exito' => false,
+                'error' => 'La API del SAT respondió con código HTTP: ' . $httpCode,
+                'codigo_http' => $httpCode,
+                'respuesta_cruda' => $response
+            ];
+        }
+        
+        // Decodificar respuesta JSON
+        $responseData = json_decode($response, true);
+        
+        if (json_last_error() !== JSON_ERROR_NONE) {
+            return [
+                'exito' => false,
+                'error' => 'Error al decodificar la respuesta JSON del SAT: ' . json_last_error_msg(),
+                'codigo_http' => $httpCode,
+                'respuesta_cruda' => $response
+            ];
+        }
+        
+        return [
+            'exito' => true,
+            'datos' => $responseData,
+            'codigo_http' => $httpCode
+        ];
+    }
+
+    /**
+     * Procesa la respuesta recibida del SAT y extrae los datos necesarios
+     * 
+     * @param array $datosRespuesta Datos JSON decodificados del SAT
+     * @param string $respuestaCompleta Respuesta completa en texto
+     * @return array Datos procesados y estructurados
+     */
+    private function procesarRespuestaSat(array $datosRespuesta, string $respuestaCompleta): array
+    {
+        try {
+            // Verificar estructura básica de la respuesta
+            if (!isset($datosRespuesta['Acuse'])) {
+                return [
+                    'exito' => false,
+                    'mensaje' => 'La respuesta del SAT no contiene la estructura esperada (falta Acuse)',
+                    'errores' => [
+                        'estructura_recibida' => array_keys($datosRespuesta),
+                        'datos_completos' => $datosRespuesta
+                    ]
+                ];
+            }
+
+            $acuse = $datosRespuesta['Acuse'];
+            
+            // Extraer HTML codificado
+            $htmlCodificado = $acuse['HTML'] ?? null;
+            $htmlDecodificado = null;
+            
+            if ($htmlCodificado) {
+                $htmlDecodificado = html_entity_decode(base64_decode($htmlCodificado), ENT_QUOTES | ENT_HTML5, 'UTF-8');
+            }
+
+            // Extraer datos principales
+            $resultado = [
+                'exito' => true,
+                'mensaje' => 'Respuesta del SAT procesada exitosamente',
+                'json_completo' => $datosRespuesta,
+                'id_documento' => $acuse['IdDocumento'] ?? null,
+                'tipo_pago' => $acuse['TipoPago'] ?? null,
+                'html_codificado' => $htmlCodificado,
+                'html_decodificado' => $htmlDecodificado,
+                'resultado' => $acuse['Resultado'] ?? null,
+                'linea_captura' => $acuse['LineaCaptura'] ?? null,
+                'importe_sat' => $acuse['Importe'] ?? null,
+                'fecha_vigencia_sat' => $acuse['FechaVigencia'] ?? null,
+                'errores' => $acuse['Errores'] ?? null,
+                'datos_adicionales' => [
+                    'solicitud_id' => $acuse['Solicitud'] ?? null,
+                    'fecha_proceso' => $acuse['FechaProceso'] ?? null,
+                    'codigo_respuesta' => $acuse['CodigoRespuesta'] ?? null
+                ]
+            ];
+
+            // Validar que se recibió el HTML
+            if (!$htmlCodificado) {
+                $resultado['exito'] = false;
+                $resultado['mensaje'] = 'La respuesta del SAT no contiene el HTML codificado';
+                $resultado['errores'] = ['html_faltante' => 'No se encontró HTML en la respuesta'];
+            }
+
+            return $resultado;
+
+        } catch (\Exception $e) {
+            return [
+                'exito' => false,
+                'mensaje' => 'Error al procesar la respuesta del SAT',
+                'errores' => [
+                    'excepcion' => $e->getMessage(),
+                    'datos_recibidos' => $datosRespuesta
+                ]
+            ];
+        }
     }
 }
